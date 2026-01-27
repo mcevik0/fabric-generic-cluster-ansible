@@ -1,0 +1,5 @@
+---
+- hosts: fabric_nodes
+  become: yes
+  roles:
+    - common
