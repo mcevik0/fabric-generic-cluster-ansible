@@ -1,5 +1,3 @@
 ---
-- hosts: fabric_nodes
-  become: yes
-  roles:
-    - common
+# file: site.yml
+- import_playbook: playbook_debug.yml

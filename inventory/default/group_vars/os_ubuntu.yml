@@ -1,0 +1,30 @@
+---
+# group_vars/os_ubuntu.yml
+# Variables specific to Ubuntu systems
+
+# Package manager specific
+package_manager: "apt"
+package_update_command: "apt update"
+
+# Ubuntu-specific packages
+os_specific_packages:
+  - apt-transport-https
+  - ca-certificates
+  - software-properties-common
+  - ubuntu-server
+
+# Service manager
+service_manager: "systemd"
+
+# Default shell
+default_shell: "/bin/bash"
+
+# Firewall
+firewall_tool: "ufw"
+firewall_enabled: true
+
+# OS family identifier
+os_family: "Debian"
+
+# Ubuntu-specific settings
+unattended_upgrades_enabled: true

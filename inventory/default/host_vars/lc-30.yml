@@ -1,0 +1,39 @@
+---
+# host_vars/lc-30.yml
+# Host-specific variables for lc-30
+
+# Host identification
+hostname: "lc-30"
+fqdn: "lc-30.salt.fabric-testbed.net"
+
+# Hardware specs (for reference/documentation)
+cpu_cores: 8
+memory_gb: 16
+disk_size_gb: 200
+
+# Network interfaces
+primary_interface: "eth1"
+primary_ip: "10.134.2.2"
+
+# Host-specific services
+services_enabled:
+  - nginx
+
+# Webserver-specific overrides
+webserver_worker_processes: 8
+webserver_worker_connections: 2048
+
+# Resource limits
+max_open_files: 65535
+
+# Backup configuration
+backup_enabled: true
+backup_schedule: "0 3 * * *"  # 3 AM daily
+
+# Monitoring tags
+monitoring_tags:
+  - webserver
+  - production
+
+# Maintenance window
+maintenance_window: "Sunday 03:00-05:00 MST"

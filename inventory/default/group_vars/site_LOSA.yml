@@ -1,0 +1,26 @@
+---
+# group_vars/site_LOSA.yml
+# Variables for LOSA site
+
+# Site identification
+site_name: "LOSA"
+site_location: "Los Angeles"
+site_code: "LOSA"
+
+# Network configuration
+site_network: "10.137.5.0/24"
+site_gateway: "10.137.5.1"
+site_vlan: 137
+
+# Site-specific DNS
+site_dns_servers:
+  - 10.137.5.1
+  - 8.8.8.8
+
+# Monitoring
+monitoring_server: "10.137.5.100"
+monitoring_enabled: true
+
+# Datacenter specifics
+datacenter_region: "us-west"
+datacenter_timezone: "America/Los_Angeles"

@@ -1,0 +1,179 @@
+---
+- block:
+  - name: Display separator
+    debug:
+      msg: "=========================================="
+
+  - name: Display host identification
+    debug:
+      msg: 
+        - "Hostname: {{ hostname | default('NOT SET') }}"
+        - "FQDN: {{ fqdn | default('NOT SET') }}"
+        - "Inventory Name: {{ inventory_hostname }}"
+        - "IP Address: {{ ansible_host }}"
+
+  - name: Display site information
+    debug:
+      msg:
+        - "Site Name: {{ site_name | default('NOT SET') }}"
+        - "Site Location: {{ site_location | default('NOT SET') }}"
+        - "Site Code: {{ site_code | default('NOT SET') }}"
+        - "Site Network: {{ site_network | default('NOT SET') }}"
+        - "Datacenter Region: {{ datacenter_region | default('NOT SET') }}"
+        - "Timezone: {{ datacenter_timezone | default('NOT SET') }}"
+
+  - name: Display OS-specific variables
+    debug:
+      msg:
+        - "OS Family: {{ os_family | default('NOT SET') }}"
+        - "Package Manager: {{ package_manager | default('NOT SET') }}"
+        - "Service Manager: {{ service_manager | default('NOT SET') }}"
+        - "Firewall Tool: {{ firewall_tool | default('NOT SET') }}"
+
+  - name: Display role information
+    debug:
+      msg:
+        - "Node Role: {{ node_role | default('NOT SET - No role assigned') }}"
+    when: node_role is defined
+
+  - name: Display webserver variables (if applicable)
+    debug:
+      msg:
+        - "Webserver Type: {{ webserver_type | default('NOT SET') }}"
+        - "Webserver Port: {{ webserver_port | default('NOT SET') }}"
+        - "Document Root: {{ webserver_document_root | default('NOT SET') }}"
+        - "Worker Processes: {{ webserver_worker_processes | default('NOT SET') }}"
+    when: "'nodes_webserver' in group_names"
+
+  - name: Display database variables (if applicable)
+    debug:
+      msg:
+        - "Database Type: {{ database_type | default('NOT SET') }}"
+        - "Database Port: {{ database_port | default('NOT SET') }}"
+        - "Max Connections: {{ database_max_connections | default('NOT SET') }}"
+        - "Shared Buffers: {{ database_shared_buffers | default('NOT SET') }}"
+    when: "'nodes_database' in group_names"
+
+  - name: Display loadbalancer variables (if applicable)
+    debug:
+      msg:
+        - "Loadbalancer Type: {{ loadbalancer_type | default('NOT SET') }}"
+        - "Loadbalancer Port: {{ loadbalancer_port | default('NOT SET') }}"
+        - "Algorithm: {{ loadbalancer_algorithm | default('NOT SET') }}"
+        - "Stats Enabled: {{ stats_enabled | default('NOT SET') }}"
+    when: "'nodes_loadbalancer' in group_names"
+
+  - name: Display common variables
+    debug:
+      msg:
+        - "Cluster Name: {{ cluster_name | default('NOT SET') }}"
+        - "Environment: {{ deployment_environment | default('NOT SET') }}"
+        - "NTP Enabled: {{ ntp_enabled | default('NOT SET') }}"
+        - "Timezone: {{ timezone | default('NOT SET') }}"
+
+  - name: Display hardware specs (from host_vars)
+    debug:
+      msg:
+        - "CPU Cores: {{ cpu_cores | default('NOT SET') }}"
+        - "Memory (GB): {{ memory_gb | default('NOT SET') }}"
+        - "Disk Size (GB): {{ disk_size_gb | default('NOT SET') }}"
+    when: cpu_cores is defined
+
+  - name: Display backup configuration
+    debug:
+      msg:
+        - "Backup Enabled: {{ backup_enabled | default('NOT SET') }}"
+        - "Backup Schedule: {{ backup_schedule | default('NOT SET') }}"
+        - "Maintenance Window: {{ maintenance_window | default('NOT SET') }}"
+    when: backup_enabled is defined
+
+  - name: Display monitoring configuration
+    debug:
+      msg:
+        - "Monitoring Enabled: {{ monitoring_enabled | default('NOT SET') }}"
+        - "Monitoring Server: {{ monitoring_server | default('NOT SET') }}"
+        - "Monitoring Tags: {{ monitoring_tags | default('NOT SET') }}"
+    when: monitoring_enabled is defined
+
+  - name: Display group memberships
+    debug:
+      msg: "This host belongs to groups: {{ group_names }}"
+
+  - name: Display end separator
+    debug:
+      msg: "=========================================="
+
+
+
+
+
+  - name: Verify lc-10 is in correct groups
+    assert:
+      that:
+        - "'site_DALL' in group_names"
+        - "'os_rocky' in group_names"
+        - "'nodes_webserver' in group_names"
+        - "'nodes_loadbalancer' in group_names"
+      success_msg: "lc-10 group memberships verified successfully"
+      fail_msg: "lc-10 has incorrect group memberships"
+
+  - name: Verify lc-10 has both role variables
+    assert:
+      that:
+        - webserver_type is defined
+        - loadbalancer_type is defined
+      success_msg: "lc-10 has both webserver and loadbalancer variables"
+      fail_msg: "lc-10 is missing role variables"
+
+
+
+
+
+  - name: Verify lc-20 is in correct groups
+    assert:
+      that:
+        - "'site_LOSA' in group_names"
+        - "'os_ubuntu' in group_names"
+        - "'nodes_database' in group_names"
+      success_msg: "lc-20 group memberships verified successfully"
+      fail_msg: "lc-20 has incorrect group memberships"
+
+  - name: Verify lc-20 database overrides
+    assert:
+      that:
+        - database_max_connections == 200
+        - database_shared_buffers == '8GB'
+      success_msg: "lc-20 host-specific database overrides are working"
+      fail_msg: "lc-20 host-specific overrides not applied correctly"
+
+
+
+
+  - name: Show variable precedence
+    debug:
+      msg:
+        - "Testing variable precedence on lc-10"
+        - "Timezone from all_nodes: {{ timezone }}"
+        - "Timezone from site_DALL: {{ datacenter_timezone }}"
+        - "Site network (site-specific): {{ site_network }}"
+        - "Note: Host vars > Group vars > all_nodes vars"
+
+
+
+
+
+  - name: Display summary
+    debug:
+      msg:
+        - ""
+        - "============ VERIFICATION SUMMARY ============"
+        - "Total hosts checked: {{ groups['all_nodes'] | length }}"
+        - "Sites configured: {{ groups.keys() | select('match', '^site_') | list | length }}"
+        - "OS types configured: {{ groups.keys() | select('match', '^os_') | list | length }}"
+        - "Roles configured: {{ groups.keys() | select('match', '^nodes_') | list | length }}"
+        - ""
+        - "Run 'ansible-playbook playbooks/verify_variables.yml -l <host>' to check specific hosts"
+        - "=============================================="
+
+  tags: 
+    - debug

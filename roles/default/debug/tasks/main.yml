@@ -1,0 +1,8 @@
+---
+- name: Debug - include vars
+  include_vars: "{{ item }}"
+  with_items:
+    - "vars/debug.yml"
+  tags: debug
+
+- import_tasks: verify_variables.yml

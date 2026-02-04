@@ -1,0 +1,28 @@
+---
+# group_vars/role_database.yml
+# Variables for database role
+
+# Database configuration
+database_type: "postgresql"
+database_port: 5432
+database_version: "15"
+
+# Database directories
+database_data_dir: "/var/lib/postgresql/data"
+database_log_dir: "/var/log/postgresql"
+
+# Connection settings
+database_max_connections: 100
+database_shared_buffers: "256MB"
+database_effective_cache_size: "1GB"
+
+# Backup settings
+database_backup_enabled: true
+database_backup_dir: "/var/backups/postgresql"
+database_backup_retention_days: 7
+
+# Replication
+database_replication_enabled: false
+
+# Role identifier
+node_role: "database"

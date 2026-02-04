@@ -1,0 +1,27 @@
+---
+# group_vars/os_debian.yml
+# Variables specific to Debian-based systems
+
+# Package manager specific
+package_manager: "apt"
+package_update_command: "apt update"
+
+# Debian-specific packages
+os_specific_packages:
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+# Service manager
+service_manager: "systemd"
+
+# Default shell
+default_shell: "/bin/bash"
+
+# Firewall
+firewall_tool: "ufw"
+firewall_enabled: false
+
+# OS family identifier
+os_family: "Debian"
