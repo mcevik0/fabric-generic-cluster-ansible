@@ -1,0 +1,37 @@
+---
+# host_vars/lc-10.yml
+# Host-specific variables for lc-10
+
+# Host identification
+hostname: "lc-10"
+fqdn: "lc-10.dall.fabric-testbed.net"
+
+# Hardware specs (for reference/documentation)
+cpu_cores: 8
+memory_gb: 16
+disk_size_gb: 200
+
+# Network interfaces
+primary_interface: "eth1"
+primary_ip: "10.133.130.2"
+
+# Host-specific services
+services_enabled:
+  - nginx
+  - haproxy
+
+# Resource limits
+max_open_files: 65535
+
+# Backup configuration
+backup_enabled: true
+backup_schedule: "0 2 * * *"  # 2 AM daily
+
+# Monitoring tags
+monitoring_tags:
+  - loadbalancer
+  - webserver
+  - critical
+
+# Maintenance window
+maintenance_window: "Sunday 02:00-04:00 CST"

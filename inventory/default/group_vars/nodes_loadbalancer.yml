@@ -1,0 +1,39 @@
+---
+# group_vars/role_loadbalancer.yml
+# Variables for load balancer role
+
+# Load balancer configuration
+loadbalancer_type: "haproxy"
+loadbalancer_port: 80
+loadbalancer_ssl_port: 443
+loadbalancer_stats_port: 8404
+
+# HAProxy settings
+haproxy_maxconn: 4096
+haproxy_timeout_connect: "5s"
+haproxy_timeout_client: "50s"
+haproxy_timeout_server: "50s"
+
+# Backend servers (these would reference your webservers)
+backend_servers:
+  - name: "web1"
+    address: "10.133.130.2"
+    port: 8080
+  - name: "web2"
+    address: "10.134.2.2"
+    port: 8080
+
+# Load balancing algorithm
+loadbalancer_algorithm: "roundrobin"
+
+# Health check
+health_check_enabled: true
+health_check_interval: "5s"
+
+# Stats interface
+stats_enabled: true
+stats_username: "admin"
+stats_uri: "/haproxy?stats"
+
+# Role identifier
+node_role: "loadbalancer"

@@ -1,0 +1,39 @@
+---
+# group_vars/all_nodes.yml
+# Variables applied to all nodes in the inventory
+
+# Common packages to install across all systems
+common_packages:
+  - vim
+  - htop
+  - curl
+  - wget
+  - net-tools
+  - git
+
+# NTP configuration
+ntp_enabled: true
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+# DNS configuration
+dns_nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Timezone setting
+timezone: "America/New_York"
+
+# SSH configuration
+ssh_port: 22
+ssh_permit_root_login: "no"
+ssh_password_authentication: "no"
+
+# Logging
+log_retention_days: 30
+
+# Environment
+deployment_environment: "production"
+cluster_name: "fabric-cluster"

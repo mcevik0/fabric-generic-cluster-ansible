@@ -1,0 +1,41 @@
+---
+# host_vars/lc-20.yml
+# Host-specific variables for lc-20
+
+# Host identification
+hostname: "lc-20"
+fqdn: "lc-20.losa.fabric-testbed.net"
+
+# Hardware specs (for reference/documentation)
+cpu_cores: 16
+memory_gb: 32
+disk_size_gb: 500
+
+# Network interfaces
+primary_interface: "eth1"
+primary_ip: "10.137.5.2"
+
+# Host-specific services
+services_enabled:
+  - postgresql
+
+# Database-specific overrides
+database_max_connections: 200
+database_shared_buffers: "8GB"
+database_effective_cache_size: "24GB"
+
+# Resource limits
+max_open_files: 65535
+
+# Backup configuration
+backup_enabled: true
+backup_schedule: "0 1 * * *"  # 1 AM daily
+
+# Monitoring tags
+monitoring_tags:
+  - database
+  - critical
+  - high-priority
+
+# Maintenance window
+maintenance_window: "Sunday 01:00-03:00 PST"

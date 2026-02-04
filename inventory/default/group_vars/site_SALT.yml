@@ -1,0 +1,26 @@
+---
+# group_vars/site_SALT.yml
+# Variables for SALT site
+
+# Site identification
+site_name: "SALT"
+site_location: "Salt Lake City"
+site_code: "SALT"
+
+# Network configuration
+site_network: "10.134.2.0/24"
+site_gateway: "10.134.2.1"
+site_vlan: 134
+
+# Site-specific DNS
+site_dns_servers:
+  - 10.134.2.1
+  - 8.8.8.8
+
+# Monitoring
+monitoring_server: "10.134.2.100"
+monitoring_enabled: true
+
+# Datacenter specifics
+datacenter_region: "us-west"
+datacenter_timezone: "America/Denver"

@@ -1,0 +1,26 @@
+---
+# group_vars/site_DALL.yml
+# Variables for DALL site
+
+# Site identification
+site_name: "DALL"
+site_location: "Dallas"
+site_code: "DALL"
+
+# Network configuration
+site_network: "10.133.130.0/24"
+site_gateway: "10.133.130.1"
+site_vlan: 130
+
+# Site-specific DNS
+site_dns_servers:
+  - 10.133.130.1
+  - 8.8.8.8
+
+# Monitoring
+monitoring_server: "10.133.130.100"
+monitoring_enabled: true
+
+# Datacenter specifics
+datacenter_region: "us-central"
+datacenter_timezone: "America/Chicago"

@@ -1,0 +1,30 @@
+---
+# group_vars/os_rocky.yml
+# Variables specific to Rocky Linux systems
+
+# Package manager specific
+package_manager: "dnf"
+package_update_command: "dnf update"
+
+# Rocky-specific packages
+os_specific_packages:
+  - epel-release
+  - dnf-plugins-core
+  - policycoreutils-python-utils
+
+# Service manager
+service_manager: "systemd"
+
+# Default shell
+default_shell: "/bin/bash"
+
+# Firewall
+firewall_tool: "firewalld"
+firewall_enabled: true
+
+# SELinux
+selinux_state: "enforcing"
+selinux_policy: "targeted"
+
+# OS family identifier
+os_family: "RedHat"
