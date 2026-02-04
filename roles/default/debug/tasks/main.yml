@@ -3,6 +3,6 @@
   include_vars: "{{ item }}"
   with_items:
     - "vars/debug.yml"
-  tags: debug
+  tags: debug, debug-example-lc10, debug-example-lc20
 
 - import_tasks: verify_variables.yml

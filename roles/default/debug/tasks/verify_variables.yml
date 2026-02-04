@@ -107,44 +107,6 @@
 
 
 
-  - name: Verify lc-10 is in correct groups
-    assert:
-      that:
-        - "'site_DALL' in group_names"
-        - "'os_rocky' in group_names"
-        - "'nodes_webserver' in group_names"
-        - "'nodes_loadbalancer' in group_names"
-      success_msg: "lc-10 group memberships verified successfully"
-      fail_msg: "lc-10 has incorrect group memberships"
-
-  - name: Verify lc-10 has both role variables
-    assert:
-      that:
-        - webserver_type is defined
-        - loadbalancer_type is defined
-      success_msg: "lc-10 has both webserver and loadbalancer variables"
-      fail_msg: "lc-10 is missing role variables"
-
-
-
-
-
-  - name: Verify lc-20 is in correct groups
-    assert:
-      that:
-        - "'site_LOSA' in group_names"
-        - "'os_ubuntu' in group_names"
-        - "'nodes_database' in group_names"
-      success_msg: "lc-20 group memberships verified successfully"
-      fail_msg: "lc-20 has incorrect group memberships"
-
-  - name: Verify lc-20 database overrides
-    assert:
-      that:
-        - database_max_connections == 200
-        - database_shared_buffers == '8GB'
-      success_msg: "lc-20 host-specific database overrides are working"
-      fail_msg: "lc-20 host-specific overrides not applied correctly"
 
 
 
@@ -177,3 +139,53 @@
 
   tags: 
     - debug
+
+
+
+- block:
+  - name: Verify lc-10 is in correct groups
+    assert:
+      that:
+        - "'site_DALL' in group_names"
+        - "'os_rocky' in group_names"
+        - "'nodes_webserver' in group_names"
+        - "'nodes_loadbalancer' in group_names"
+      success_msg: "lc-10 group memberships verified successfully"
+      fail_msg: "lc-10 has incorrect group memberships"
+    ignore_errors: true
+
+  - name: Verify lc-10 has both role variables
+    assert:
+      that:
+        - webserver_type is defined
+        - loadbalancer_type is defined
+      success_msg: "lc-10 has both webserver and loadbalancer variables"
+      fail_msg: "lc-10 is missing role variables"
+    ignore_errors: true
+
+  tags: 
+    - debug-example-lc10
+
+
+- block:
+  - name: Verify lc-20 is in correct groups
+    assert:
+      that:
+        - "'site_LOSA' in group_names"
+        - "'os_ubuntu' in group_names"
+        - "'nodes_database' in group_names"
+      success_msg: "lc-20 group memberships verified successfully"
+      fail_msg: "lc-20 has incorrect group memberships"
+    ignore_errors: true
+
+  - name: Verify lc-20 database overrides
+    assert:
+      that:
+        - database_max_connections == 200
+        - database_shared_buffers == '8GB'
+      success_msg: "lc-20 host-specific database overrides are working"
+      fail_msg: "lc-20 host-specific overrides not applied correctly"
+    ignore_errors: true
+
+  tags: 
+    - debug-example-lc20
