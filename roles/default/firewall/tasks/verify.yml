@@ -1,0 +1,47 @@
+---
+# roles/default/firewall/tasks/verify.yml
+# Verify firewall configuration
+
+- name: Get firewalld status (RedHat)
+  command: firewall-cmd --state
+  register: firewalld_status
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "RedHat"
+  tags: firewall, verify
+
+- name: List active firewalld zones (RedHat)
+  command: firewall-cmd --get-active-zones
+  register: firewalld_zones
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+  tags: firewall, verify
+
+- name: List allowed services in default zone (RedHat)
+  command: "firewall-cmd --zone={{ firewall_default_zone | default('public') }} --list-services"
+  register: firewalld_services
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+  tags: firewall, verify
+
+- name: Display firewalld status (RedHat)
+  debug:
+    msg:
+      - "Firewalld state: {{ firewalld_status.stdout | default('Unknown') }}"
+      - "Active zones: {{ firewalld_zones.stdout | default('Unknown') }}"
+      - "Allowed services: {{ firewalld_services.stdout | default('Unknown') }}"
+  when: ansible_os_family == "RedHat"
+  tags: firewall, verify
+
+- name: Get UFW status (Debian)
+  command: ufw status verbose
+  register: ufw_status
+  changed_when: false
+  when: ansible_os_family == "Debian"
+  tags: firewall, verify
+
+- name: Display UFW status (Debian)
+  debug:
+    var: ufw_status.stdout_lines
+  when: ansible_os_family == "Debian"
+  tags: firewall, verify

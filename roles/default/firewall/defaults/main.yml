@@ -1,0 +1,36 @@
+---
+# roles/default/firewall/defaults/main.yml
+# Default variables for firewall role
+
+# Default firewall zone (RedHat)
+firewall_default_zone: "public"
+
+# Services to allow through firewall
+firewall_allowed_services:
+  - ssh
+  - dhcpv6-client
+
+# Custom ports to allow
+# Example:
+# firewall_allowed_ports:
+#   - port: 8080
+#     protocol: tcp
+#   - port: 9090
+#     protocol: tcp
+firewall_allowed_ports: []
+
+# Trusted IP addresses or networks (allowed for all traffic)
+# Example:
+# firewall_trusted_sources:
+#   - 10.0.0.0/8
+#   - 192.168.1.0/24
+firewall_trusted_sources: []
+
+# Services to explicitly block (optional)
+firewall_blocked_services: []
+
+# UFW logging level: off, low, medium, high, full
+firewall_logging_level: "low"
+
+# Whether firewall is enabled
+firewall_enabled: true

@@ -1,0 +1,21 @@
+---
+# roles/default/timesync/defaults/main.yml
+# Default variables for timesync role
+
+# NTP servers to use
+ntp_servers:
+  - hostname: 0.pool.ntp.org
+    iburst: yes
+  - hostname: 1.pool.ntp.org
+    iburst: yes
+  - hostname: 2.pool.ntp.org
+    iburst: yes
+  - hostname: 3.pool.ntp.org
+    iburst: yes
+
+# NTP provider: chrony (default) or ntp
+# chrony is preferred for modern systems
+ntp_provider: "chrony"
+
+# Enable NTP
+timesync_enabled: true

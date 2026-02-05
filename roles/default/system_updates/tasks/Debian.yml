@@ -1,0 +1,48 @@
+---
+# roles/default/system_updates/tasks/Debian.yml
+# System updates for Debian-based systems
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags: updates
+
+- name: Upgrade all packages (Debian/Ubuntu)
+  apt:
+    upgrade: "{{ apt_upgrade_type | default('dist') }}"
+    update_cache: yes
+    autoremove: yes
+    autoclean: yes
+  when: update_all_packages | default(true)
+  register: apt_update_result
+  tags: updates
+
+- name: Upgrade specific packages only (if list provided)
+  apt:
+    name: "{{ packages_to_update }}"
+    state: latest
+  when: 
+    - not (update_all_packages | default(true))
+    - packages_to_update is defined
+  tags: updates
+
+- name: Remove unused dependencies
+  apt:
+    autoremove: yes
+  when: autoremove | default(true)
+  tags: updates
+
+- name: Clean apt cache
+  apt:
+    autoclean: yes
+  when: clean_cache | default(true)
+  tags: updates
+
+- name: Display update summary
+  debug:
+    msg: 
+      - "Packages upgraded: {{ apt_update_result.changed | default(false) }}"
+      - "Cache updated: {{ apt_update_result.cache_updated | default(false) }}"
+  when: apt_update_result is defined
+  tags: updates

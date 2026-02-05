@@ -1,3 +1,36 @@
 ---
-# file: site.yml
+# file: playbooks/default/site.yml
+# Master playbook - imports all other playbooks
+
+- name: Display site playbook information
+  hosts: all_nodes
+  gather_facts: no
+  tasks:
+    - name: Site playbook started
+      debug:
+        msg:
+          - "=========================================="
+          - "FABRIC Generic Cluster - Site Playbook"
+          - "=========================================="
+          - "This playbook orchestrates all configurations"
+          - ""
+
+# Base system configuration
+- import_playbook: playbook_base_config.yml
+  tags: all
+
+# Debug and verification (optional, can be run with --tags debug)
 - import_playbook: playbook_debug.yml
+  tags: debug, never
+
+- name: Site playbook completed
+  hosts: all_nodes
+  gather_facts: no
+  tasks:
+    - name: Display completion
+      debug:
+        msg:
+          - ""
+          - "=========================================="
+          - "All playbooks completed successfully!"
+          - "=========================================="
