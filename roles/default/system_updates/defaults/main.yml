@@ -1,0 +1,24 @@
+---
+# roles/default/system_updates/defaults/main.yml
+# Default variables for system_updates role
+
+# Whether to update all packages
+update_all_packages: true
+
+# Specific packages to update (used when update_all_packages is false)
+packages_to_update: []
+
+# Whether to allow automatic reboot after updates
+allow_reboot: false
+
+# APT upgrade type: safe, full, or dist
+apt_upgrade_type: "dist"
+
+# Whether to remove unused dependencies (Debian)
+autoremove: true
+
+# Whether to clean package cache
+clean_cache: false
+
+# Exclude specific packages from updates
+exclude_packages: []

@@ -1,0 +1,30 @@
+---
+# roles/default/common/defaults/main.yml
+# Default variables for common role
+
+# Whether to update /etc/hosts file with cluster nodes
+update_hosts_file: true
+
+# Whether to configure basic firewall rules
+configure_firewall: false
+
+# Firewall state
+firewall_enabled: false
+
+# Timezone (override in group_vars or host_vars)
+timezone: "America/New_York"
+
+# Common directories to create
+common_directories:
+  - /opt/scripts
+  - /opt/logs
+  - /opt/backups
+
+# Common services (example, customize as needed)
+common_services: []
+  # - chronyd
+  # - sshd
+
+# SELinux configuration (RedHat only)
+selinux_state: "enforcing"
+selinux_policy: "targeted"

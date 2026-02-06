@@ -1,0 +1,75 @@
+---
+# roles/default/firewall/tasks/RedHat.yml
+# Firewall configuration for RedHat using linux-system-roles
+
+- name: Include firewall role from linux-system-roles
+  include_role:
+    name: fedora.linux_system_roles.firewall
+  vars:
+    firewall:
+      - zone: "{{ firewall_default_zone | default('public') }}"
+        service: "{{ firewall_allowed_services }}"
+        port: "{{ firewall_allowed_ports | default([]) }}"
+        state: enabled
+      - zone: "{{ firewall_default_zone | default('public') }}"
+        source: "{{ item }}"
+        state: enabled
+  loop: "{{ firewall_trusted_sources | default([]) }}"
+  when: firewall_trusted_sources is defined and firewall_trusted_sources | length > 0
+  tags: firewall
+
+- name: Ensure firewalld is running
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+  tags: firewall
+
+- name: Set default zone
+  command: "firewall-cmd --set-default-zone={{ firewall_default_zone | default('public') }}"
+  changed_when: false
+  tags: firewall
+
+- name: Allow services in firewall
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: "{{ firewall_default_zone | default('public') }}"
+    immediate: yes
+  loop: "{{ firewall_allowed_services }}"
+  when: firewall_allowed_services is defined
+  tags: firewall
+
+- name: Allow custom ports in firewall
+  firewalld:
+    port: "{{ item.port }}/{{ item.protocol | default('tcp') }}"
+    permanent: yes
+    state: enabled
+    zone: "{{ firewall_default_zone | default('public') }}"
+    immediate: yes
+  loop: "{{ firewall_allowed_ports }}"
+  when: firewall_allowed_ports is defined
+  tags: firewall
+
+- name: Add trusted sources
+  firewalld:
+    source: "{{ item }}"
+    zone: trusted
+    permanent: yes
+    state: enabled
+    immediate: yes
+  loop: "{{ firewall_trusted_sources }}"
+  when: firewall_trusted_sources is defined
+  tags: firewall
+
+- name: Remove services from firewall (if specified)
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: disabled
+    zone: "{{ firewall_default_zone | default('public') }}"
+    immediate: yes
+  loop: "{{ firewall_blocked_services | default([]) }}"
+  when: firewall_blocked_services is defined
+  tags: firewall

@@ -1,4 +1,33 @@
 ---
-- hosts: all_nodes
+- name: Check Ansible Variables
+  hosts: all_nodes
+  become: yes
+
+  pre_tasks:
+    - name: Display playbook information
+      debug:
+        msg:
+          - "======================================"
+          - "Check Ansible Variables Playbook"
+          - "Target hosts: {{ ansible_play_hosts | length }} nodes"
+          - "======================================"
+      run_once: true
+      tags: always
+
+    - name: Gather facts if not already gathered
+      setup:
+      when: ansible_facts.keys() | length == 0
+      tags: always
+
   roles:
-    - debug
+    - role: debug
+
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg:
+          - "======================================"
+          - "Check Ansible Variables completed successfully!"
+          - "Host: {{ inventory_hostname }}"
+          - "======================================"
+      tags: always

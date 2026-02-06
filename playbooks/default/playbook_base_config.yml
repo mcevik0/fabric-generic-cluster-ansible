@@ -1,0 +1,56 @@
+---
+# playbooks/default/playbook_base_config.yml
+# Base system configuration playbook
+# Applies fundamental configurations to all nodes
+
+- name: Base System Configuration
+  hosts: all_nodes
+  become: yes
+  
+  pre_tasks:
+    - name: Display playbook information
+      debug:
+        msg:
+          - "======================================"
+          - "Base System Configuration Playbook"
+          - "Target hosts: {{ ansible_play_hosts | length }} nodes"
+          - "======================================"
+      run_once: true
+      tags: always
+
+    - name: Gather facts if not already gathered
+      setup:
+      when: ansible_facts.keys() | length == 0
+      tags: always
+
+  roles:
+    - role: common
+      tags: common
+      
+    - role: system_updates
+      tags: updates
+      when: perform_updates | default(true)
+      
+    - role: timesync
+      tags: timesync
+      when: configure_timesync | default(true)
+      
+    - role: selinux
+      tags: selinux
+      when: 
+        - ansible_os_family == "RedHat"
+        - configure_selinux | default(true)
+      
+    - role: firewall
+      tags: firewall
+      when: configure_firewall | default(false)
+
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg:
+          - "======================================"
+          - "Base configuration completed successfully!"
+          - "Host: {{ inventory_hostname }}"
+          - "======================================"
+      tags: always

@@ -1,0 +1,39 @@
+---
+# roles/default/system_updates/tasks/RedHat.yml
+# System updates for RedHat-based systems
+
+- name: Update all packages (RedHat)
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: yes
+  when: update_all_packages | default(true)
+  register: dnf_update_result
+  tags: updates
+
+- name: Install yum-utils for needs-restarting command
+  dnf:
+    name: yum-utils
+    state: present
+  tags: updates
+
+- name: Upgrade specific packages only (if list provided)
+  dnf:
+    name: "{{ packages_to_update }}"
+    state: latest
+  when: 
+    - not (update_all_packages | default(true))
+    - packages_to_update is defined
+  tags: updates
+
+- name: Clean dnf cache
+  command: dnf clean all
+  when: clean_cache | default(false)
+  changed_when: false
+  tags: updates
+
+- name: Display update summary
+  debug:
+    msg: "{{ dnf_update_result.results | default('No updates performed') }}"
+  when: dnf_update_result is defined
+  tags: updates

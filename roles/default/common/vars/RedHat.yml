@@ -1,0 +1,32 @@
+---
+# roles/default/common/vars/RedHat.yml
+# Variables for RedHat-based systems (Rocky, CentOS, RHEL, Fedora)
+
+common_packages:
+  - vim
+  - git
+  - wget
+  - curl
+  - net-tools
+  - bind-utils
+  - tcpdump
+  - iperf3
+  - tree
+  - jq
+  - htop
+  - tmux
+  - rsync
+  - tar
+  - unzip
+  - lsof
+  - strace
+
+# Additional RedHat-specific packages
+common_packages_extra:
+  - epel-release
+  - dnf-plugins-core
+  - python3
+  - python3-pip
+
+# Combine both lists
+all_common_packages: "{{ common_packages + common_packages_extra }}"

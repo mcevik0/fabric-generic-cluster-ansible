@@ -1,0 +1,37 @@
+---
+# roles/default/selinux/defaults/main.yml
+# Default variables for selinux role
+
+# SELinux state: enforcing, permissive, or disabled
+selinux_target_state: "enforcing"
+
+# SELinux policy type: targeted or mls
+selinux_target_policy: "targeted"
+
+# Custom SELinux booleans
+# Example:
+# selinux_custom_booleans:
+#   - name: httpd_can_network_connect
+#     state: on
+#     persistent: yes
+selinux_custom_booleans: []
+
+# Custom file contexts
+# Example:
+# selinux_custom_fcontexts:
+#   - target: '/opt/myapp(/.*)?'
+#     setype: httpd_sys_content_t
+#     state: present
+selinux_custom_fcontexts: []
+
+# Custom port contexts
+# Example:
+# selinux_custom_ports:
+#   - ports: '8080'
+#     proto: tcp
+#     setype: http_port_t
+#     state: present
+selinux_custom_ports: []
+
+# Whether to restore file contexts after changes
+selinux_restore_contexts: true

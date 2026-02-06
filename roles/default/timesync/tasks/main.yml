@@ -1,0 +1,22 @@
+---
+# roles/default/timesync/tasks/main.yml
+# Time synchronization using linux-system-roles
+
+- name: Include timesync role from linux-system-roles
+  include_role:
+    name: fedora.linux_system_roles.timesync
+  vars:
+    timesync_ntp_servers: "{{ ntp_servers }}"
+    timesync_ntp_provider: "{{ ntp_provider | default('chrony') }}"
+  tags: timesync
+
+- name: Verify time synchronization status
+  command: timedatectl status
+  register: timesync_status
+  changed_when: false
+  tags: timesync, verify
+
+- name: Display time synchronization status
+  debug:
+    var: timesync_status.stdout_lines
+  tags: timesync, verify

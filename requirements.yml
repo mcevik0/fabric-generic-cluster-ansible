@@ -1,0 +1,26 @@
+---
+# requirements.yml
+# Ansible Galaxy requirements for fabric-generic-cluster-ansible
+
+# Collections
+collections:
+  # Community General Collection - useful utilities and modules
+  - name: community.general
+    version: ">=8.0.0"
+  
+  # POSIX collection - for various system operations
+  - name: ansible.posix
+    version: ">=1.5.0"
+  
+  # Linux System Roles Collection (includes all system roles)
+  - name: fedora.linux_system_roles
+    version: ">=1.0.0"
+
+# Note: The linux-system-roles are now distributed as a collection
+# They are included in the fedora.linux_system_roles collection above
+# No need to install individual roles separately
+
+# If you need other roles, add them here:
+# roles:
+#   - name: geerlingguy.docker
+#     version: "7.0.2"

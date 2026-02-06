@@ -1,0 +1,39 @@
+---
+# roles/default/selinux/tasks/main.yml
+# SELinux configuration using linux-system-roles (RedHat only)
+
+- name: Check if system is RedHat-based
+  assert:
+    that: ansible_os_family == "RedHat"
+    fail_msg: "SELinux role is only applicable to RedHat-based systems"
+    success_msg: "System is RedHat-based, proceeding with SELinux configuration"
+  tags: selinux
+
+- name: Include selinux role from linux-system-roles
+  include_role:
+    name: fedora.linux_system_roles.selinux
+  vars:
+    selinux_state: "{{ selinux_target_state }}"
+    selinux_policy: "{{ selinux_target_policy }}"
+    selinux_booleans: "{{ selinux_custom_booleans | default([]) }}"
+    selinux_fcontexts: "{{ selinux_custom_fcontexts | default([]) }}"
+    selinux_ports: "{{ selinux_custom_ports | default([]) }}"
+  tags: selinux
+
+- name: Get current SELinux status
+  command: getenforce
+  register: selinux_current_status
+  changed_when: false
+  failed_when: false
+  tags: selinux, verify
+
+- name: Display SELinux status
+  debug:
+    msg: "Current SELinux mode: {{ selinux_current_status.stdout | default('Unknown') }}"
+  tags: selinux, verify
+
+- name: Check if reboot is required for SELinux changes
+  debug:
+    msg: "WARNING: Changing SELinux mode from enforcing to permissive (or vice versa) may require a reboot"
+  when: selinux_current_status.stdout != selinux_target_state
+  tags: selinux

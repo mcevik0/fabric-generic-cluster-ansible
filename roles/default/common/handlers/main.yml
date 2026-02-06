@@ -1,0 +1,23 @@
+---
+# roles/default/common/handlers/main.yml
+# Handlers for common role
+
+- name: restart sshd
+  systemd:
+    name: sshd
+    state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted
+  when: ansible_os_family == "RedHat"
+
+- name: reload ufw
+  ufw:
+    state: reloaded
+  when: ansible_os_family == "Debian"

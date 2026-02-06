@@ -1,0 +1,110 @@
+---
+# roles/default/common/tasks/main.yml
+# Common configuration tasks for all nodes
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: common
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+  tags: common, hostname
+
+- name: Update /etc/hosts with all cluster nodes
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item].ansible_host }} {{ item }}"
+    regexp: "^{{ hostvars[item].ansible_host }}.*{{ item }}"
+    state: present
+  loop: "{{ groups['all_nodes'] }}"
+  when: update_hosts_file | default(true)
+  tags: common, hosts
+
+# RedHat-specific package installation
+- name: Install EPEL repository (RedHat family)
+  dnf:
+    name: epel-release
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+  tags: common, packages, epel
+
+- name: Install base packages (RedHat family - no EPEL needed)
+  dnf:
+    name: "{{ common_packages }}"
+    state: present
+  when: ansible_os_family == "RedHat"
+  tags: common, packages
+
+- name: Install packages from EPEL (RedHat family)
+  dnf:
+    name:
+      - iperf3
+      - htop
+    state: present
+  when: ansible_os_family == "RedHat"
+  ignore_errors: yes
+  tags: common, packages, epel
+
+- name: Install common packages (Debian family)
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+  tags: common, packages
+
+- name: Ensure common services are enabled and started
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop: "{{ common_services | default([]) }}"
+  when: common_services is defined
+  ignore_errors: yes
+  tags: common, services
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+  when: timezone is defined
+  tags: common, timezone
+
+- name: Create common directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ common_directories | default([]) }}"
+  when: common_directories is defined
+  tags: common, directories
+
+- name: Configure bash aliases
+  blockinfile:
+    path: /etc/profile.d/custom_aliases.sh
+    create: yes
+    mode: '0644'
+    block: |
+      # Custom aliases for fabric cluster
+      alias ll='ls -lah'
+      alias grep='grep --color=auto'
+      alias df='df -h'
+      alias free='free -h'
+      alias ports='netstat -tulanp'
+  tags: common, aliases
+
+- name: Disable SELinux (if requested)
+  selinux:
+    state: "{{ selinux_state | default('enforcing') }}"
+    policy: "{{ selinux_policy | default('targeted') }}"
+  when: 
+    - ansible_os_family == "RedHat"
+    - selinux_state is defined
+  tags: common, selinux
+
+- name: Configure firewall (basic rules)
+  include_tasks: firewall.yml
+  when: configure_firewall | default(false)
+  tags: common, firewall

@@ -1,0 +1,17 @@
+---
+# roles/default/firewall/tasks/main.yml
+# Firewall configuration using linux-system-roles for RedHat, custom for Debian
+
+- name: Configure firewall on RedHat systems
+  include_tasks: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags: firewall
+
+- name: Configure firewall on Debian systems
+  include_tasks: Debian.yml
+  when: ansible_os_family == "Debian"
+  tags: firewall
+
+- name: Verify firewall status
+  include_tasks: verify.yml
+  tags: firewall, verify
