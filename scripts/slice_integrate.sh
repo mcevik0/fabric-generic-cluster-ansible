@@ -249,7 +249,7 @@ if [ -d "${REPO_DIR}/roles/default" ]; then
             role_name=$(basename "$role_path")
             ln -sf "${role_path}" "${SLICE_ROLES_DIR}/${role_name}"
             print_info "  Linked: ${role_name}"
-            ((role_count++))
+            role_count=$((role_count + 1)) 
         fi
     done
     print_success "Created ${role_count} role symlink(s)"
@@ -267,7 +267,7 @@ if [ -d "${REPO_DIR}/playbooks/default" ]; then
             playbook_name=$(basename "$playbook_path")
             ln -sf "${playbook_path}" "${SLICE_PLAYBOOKS_DIR}/${playbook_name}"
             print_info "  Linked: ${playbook_name}"
-            ((playbook_count++))
+            playbook_count=$((playbook_count + 1)) 
         fi
     done
     print_success "Created ${playbook_count} playbook symlink(s)"
