@@ -234,7 +234,7 @@ fqdn: "${hostname}.fabric.net"
 EOF
         print_info "  Generated: ${hostname}.yml"
     fi
-    ((host_count++))
+    host_count=$((host_count + 1)) 
 done
 
 print_success "Generated host_vars for ${host_count} host(s)"
