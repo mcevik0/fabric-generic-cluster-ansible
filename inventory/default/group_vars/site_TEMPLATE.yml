@@ -1,0 +1,25 @@
+---
+# Site-specific variables template
+# This file is used to generate site_<SITE>.yml files
+
+site_name: "SITE_NAME_PLACEHOLDER"
+site_location: "SITE_LOCATION_PLACEHOLDER"
+site_code: "SITE_CODE_PLACEHOLDER"
+
+# Network configuration (customize per site as needed)
+site_network: "SITE_NETWORK_PLACEHOLDER"
+site_gateway: "SITE_GATEWAY_PLACEHOLDER"
+site_vlan: SITE_VLAN_PLACEHOLDER
+
+# Site-specific DNS
+site_dns_servers:
+  - SITE_GATEWAY_PLACEHOLDER
+  - 8.8.8.8
+
+# Monitoring
+monitoring_server: "SITE_MONITORING_PLACEHOLDER"
+monitoring_enabled: true
+
+# Datacenter specifics
+datacenter_region: "DATACENTER_REGION_PLACEHOLDER"
+datacenter_timezone: "DATACENTER_TIMEZONE_PLACEHOLDER"
