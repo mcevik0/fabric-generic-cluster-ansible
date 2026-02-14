@@ -4,3 +4,13 @@
 # Default fallback values if OS-specific vars are not found
 docker_repo_url: ""
 docker_gpg_key: ""
+
+docker_users:
+  - "{{ ansible_user }}"
+docker_install_compose: true
+docker_daemon_config:
+  log-driver: "json-file"
+  log-opts:
+    max-size: "10m"
+    max-file: "3"
+  storage-driver: "overlay2"

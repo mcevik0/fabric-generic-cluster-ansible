@@ -45,6 +45,10 @@
       tags: firewall
       when: configure_firewall | default(false)
 
+    - role: docker
+      tags: docker,docker-verify
+      when: configure_docker | default(true)
+
   post_tasks:
     - name: Display completion message
       debug:
