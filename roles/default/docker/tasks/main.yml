@@ -1,0 +1,76 @@
+---
+# tasks file for docker
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+  tags: always
+
+- name: Include OS-specific installation tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "install_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+    - "install_{{ ansible_os_family }}.yml"
+  tags: docker
+
+- name: Ensure Docker service directory exists
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+  tags: docker
+
+- name: Configure Docker daemon
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  notify: restart docker
+  when: docker_daemon_config | length > 0
+  tags: docker
+
+- name: Add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users }}"
+  when: docker_users | length > 0
+  tags: docker
+
+- name: Install Docker Compose
+  ansible.builtin.include_tasks: install_compose.yml
+  when: docker_install_compose | bool
+  tags: docker
+
+- name: Ensure Docker is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+  tags: docker
+
+- name: Verify Docker installation
+  ansible.builtin.command: docker --version
+  register: docker_version_output
+  changed_when: false
+  tags: docker-verify
+
+- name: Display Docker version
+  ansible.builtin.debug:
+    msg: "Docker installed: {{ docker_version_output.stdout }}"
+  tags: docker-verify
+
+- name: Check user is in docker group
+  ansible.builtin.command: groups
+  register: user_groups
+  changed_when: false
+  tags: docker-verify
+
+- name: Display user groups
+  ansible.builtin.debug:
+    var: user_groups.stdout
+  tags: docker-verify

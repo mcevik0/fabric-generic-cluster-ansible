@@ -1,0 +1,12 @@
+---
+# handlers file for docker
+
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+- name: reload docker
+  ansible.builtin.service:
+    name: docker
+    state: reloaded

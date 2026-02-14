@@ -1,0 +1,6 @@
+---
+# vars file for docker - default
+
+# Default fallback values if OS-specific vars are not found
+docker_repo_url: ""
+docker_gpg_key: ""
