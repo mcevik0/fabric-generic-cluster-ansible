@@ -1,0 +1,41 @@
+---
+# Install Docker Compose (standalone binary)
+
+- name: Check if Docker Compose is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/docker-compose
+  register: docker_compose_binary
+
+- name: Get latest Docker Compose version
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/docker/compose/releases/latest
+    return_content: true
+  register: docker_compose_latest
+  when: docker_compose_version == "latest"
+
+- name: Set Docker Compose version
+  ansible.builtin.set_fact:
+    docker_compose_install_version: "{{ docker_compose_latest.json.tag_name if docker_compose_version == 'latest' else docker_compose_version }}"
+
+- name: Download Docker Compose
+  ansible.builtin.get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_install_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  when: not docker_compose_binary.stat.exists or docker_compose_force_install
+
+- name: Create symbolic link for docker-compose
+  ansible.builtin.file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    state: link
+  when: docker_compose_symlink
+
+- name: Verify Docker Compose installation
+  ansible.builtin.command: docker-compose --version
+  register: docker_compose_version_output
+  changed_when: false
+
+- name: Display Docker Compose version
+  ansible.builtin.debug:
+    msg: "Docker Compose installed: {{ docker_compose_version_output.stdout }}"

@@ -1,0 +1,38 @@
+---
+# defaults file for docker
+
+# Package state (present, latest)
+docker_package_state: present
+
+# Docker daemon configuration
+docker_daemon_config:
+  log-driver: "json-file"
+  log-opts:
+    max-size: "10m"
+    max-file: "3"
+  storage-driver: "overlay2"
+
+# Users to add to docker group
+docker_users: []
+
+# Docker Compose installation
+docker_install_compose: true
+docker_compose_version: "latest"
+docker_compose_force_install: false
+docker_compose_symlink: true
+
+# Firewall configuration
+docker_configure_firewall: false
+docker_firewall_zone: "public"
+docker_firewall_ports:
+  - "2375/tcp"  # Docker daemon (insecure)
+  - "2376/tcp"  # Docker daemon (secure)
+  - "2377/tcp"  # Swarm cluster management
+  - "7946/tcp"  # Swarm node communication
+  - "7946/udp"  # Swarm node communication
+  - "4789/udp"  # Swarm overlay network
+
+# Enable/disable specific features
+docker_enable_ipv6: false
+docker_live_restore: true
+docker_userland_proxy: true

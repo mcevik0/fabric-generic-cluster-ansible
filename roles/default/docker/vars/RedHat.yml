@@ -1,0 +1,5 @@
+---
+# vars file for docker - RedHat family
+
+docker_repo_url: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
+docker_gpg_key: "https://download.docker.com/linux/centos/gpg"
