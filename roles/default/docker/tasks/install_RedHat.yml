@@ -16,7 +16,6 @@
       - runc
     state: absent
   ignore_errors: true
-  tags: docker
 
 - name: Install required packages (Rocky/RHEL)
   ansible.builtin.dnf:
@@ -25,7 +24,6 @@
       - device-mapper-persistent-data
       - lvm2
     state: present
-  tags: docker
 
 - name: Add Docker CE repository (Rocky/RHEL)
   ansible.builtin.yum_repository:
@@ -35,7 +33,6 @@
     gpgcheck: true
     gpgkey: "{{ docker_gpg_key }}"
     enabled: true
-  tags: docker
 
 - name: Install Docker Engine (Rocky/RHEL)
   ansible.builtin.dnf:
@@ -46,4 +43,3 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: "{{ docker_package_state }}"
-  tags: docker
