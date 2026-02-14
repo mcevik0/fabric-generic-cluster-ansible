@@ -11,11 +11,13 @@
       - runc
     state: absent
   ignore_errors: true
+  tags: docker
 
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  tags: docker
 
 - name: Install dependencies (Debian/Ubuntu)
   ansible.builtin.apt:
@@ -25,28 +27,33 @@
       - gnupg
       - lsb-release
     state: present
+  tags: docker
 
 - name: Create keyrings directory
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
+  tags: docker
 
 - name: Add Docker GPG key (Debian/Ubuntu)
   ansible.builtin.apt_key:
     url: "{{ docker_gpg_key }}"
     keyring: /etc/apt/keyrings/docker.gpg
     state: present
+  tags: docker
 
 - name: Add Docker repository (Debian/Ubuntu)
   ansible.builtin.apt_repository:
     repo: "deb [arch={{ docker_apt_arch }} signed-by=/etc/apt/keyrings/docker.gpg] {{ docker_repo_url }} {{ ansible_distribution_release }} stable"
     state: present
     filename: docker
+  tags: docker
 
 - name: Update apt cache after adding repository
   ansible.builtin.apt:
     update_cache: true
+  tags: docker
 
 - name: Install Docker Engine (Debian/Ubuntu)
   ansible.builtin.apt:
@@ -57,3 +64,4 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: "{{ docker_package_state }}"
+  tags: docker
