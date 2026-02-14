@@ -1,0 +1,37 @@
+---
+# defaults file for prometheus
+
+# Docker image and version
+prometheus_image: "prom/prometheus"
+prometheus_version: "v2.48.1"
+
+# Port configuration
+prometheus_port: 9090
+
+# Directory configuration
+prometheus_config_dir: /etc/prometheus
+prometheus_data_dir: /var/lib/prometheus
+
+# Retention configuration
+prometheus_retention_time: "15d"
+prometheus_retention_size: "10GB"
+
+# Scrape configuration
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+
+# Global labels
+prometheus_external_labels: {}
+
+# Alerting configuration
+prometheus_enable_alerting: false
+prometheus_alertmanager_url: ""
+
+# Firewall configuration
+prometheus_configure_firewall: true
+prometheus_firewall_zone: "public"
+
+# Targets for scraping (auto-populated from inventory)
+prometheus_static_targets:
+  node_exporter: []
+  cadvisor: []

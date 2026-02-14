@@ -1,0 +1,69 @@
+---
+# tasks file for cadvisor
+
+- name: Ensure Docker is installed
+  ansible.builtin.service:
+    name: docker
+    state: started
+  tags: always
+
+- name: Create cadvisor data directory
+  ansible.builtin.file:
+    path: "{{ cadvisor_data_dir }}"
+    state: directory
+    mode: '0755'
+  tags: cadvisor
+
+- name: Pull cAdvisor Docker image
+  community.docker.docker_image:
+    name: "{{ cadvisor_image }}"
+    tag: "{{ cadvisor_version }}"
+    source: pull
+  tags: cadvisor
+
+- name: Run cAdvisor container
+  community.docker.docker_container:
+    name: cadvisor
+    image: "{{ cadvisor_image }}:{{ cadvisor_version }}"
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "{{ cadvisor_port }}:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    command: "{{ cadvisor_extra_args }}"
+  tags: cadvisor
+
+- name: Configure firewall for cAdvisor
+  ansible.posix.firewalld:
+    port: "{{ cadvisor_port }}/tcp"
+    permanent: true
+    state: enabled
+    zone: "{{ cadvisor_firewall_zone }}"
+  when: 
+    - ansible_os_family == "RedHat"
+    - cadvisor_configure_firewall | bool
+  notify: reload firewalld
+  tags: cadvisor
+
+- name: Wait for cAdvisor to be ready
+  ansible.builtin.uri:
+    url: "http://localhost:{{ cadvisor_port }}/metrics"
+    status_code: 200
+  register: cadvisor_health
+  retries: 5
+  delay: 3
+  tags: cadvisor-verify
+
+- name: Display cAdvisor status
+  ansible.builtin.debug:
+    msg: "cAdvisor is running on port {{ cadvisor_port }}"
+  when: cadvisor_health.status == 200
+  tags: cadvisor-verify
