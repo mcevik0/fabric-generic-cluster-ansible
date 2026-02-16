@@ -10,3 +10,6 @@ grafana_admin_user: admin
 grafana_admin_password: "CHANGE_ME_NOW"  # IMPORTANT: Set a secure password!
 grafana_configure_firewall: false
 grafana_install_dashboards: true
+
+grafana_prometheus_url: "http://{{ ansible_host }}:9090"
+
