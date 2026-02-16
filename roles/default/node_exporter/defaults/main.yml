@@ -11,7 +11,7 @@ node_exporter_port: 9100
 # Collectors to enable (default enables most useful collectors)
 node_exporter_enabled_collectors:
   - systemd
-  - textfile:directory=/var/lib/node_exporter/textfile_collector
+  - textfile.directory=/var/lib/node_exporter/textfile_collector
 
 node_exporter_disabled_collectors: []
 
