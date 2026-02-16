@@ -1,3 +1,4 @@
 ---
 # vars file for grafana - RedHat family
-# No OS-specific variables needed
+
+# No OS-specific variables needed for Grafana (runs in Docker)

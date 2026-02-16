@@ -79,6 +79,15 @@
       GF_SERVER_ROOT_URL: "http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}"
   tags: grafana
 
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - grafana_configure_firewall | bool
+  tags: grafana
+
 - name: Configure firewall for Grafana
   ansible.posix.firewalld:
     port: "{{ grafana_port }}/tcp"

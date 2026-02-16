@@ -72,6 +72,15 @@
       - "--web.enable-lifecycle"
   tags: prometheus
 
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - prometheus_configure_firewall | bool
+  tags: prometheus
+
 - name: Configure firewall for Prometheus
   ansible.posix.firewalld:
     port: "{{ prometheus_port }}/tcp"

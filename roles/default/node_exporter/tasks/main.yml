@@ -98,6 +98,15 @@
     - restart node_exporter
   tags: node_exporter
 
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - node_exporter_configure_firewall | bool
+  tags: node_exporter
+
 - name: Configure firewall for node_exporter
   ansible.posix.firewalld:
     port: "{{ node_exporter_port }}/tcp"

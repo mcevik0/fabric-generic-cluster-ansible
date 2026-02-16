@@ -41,6 +41,15 @@
     command: "{{ cadvisor_extra_args }}"
   tags: cadvisor
 
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - cadvisor_configure_firewall | bool
+  tags: cadvisor
+
 - name: Configure firewall for cAdvisor
   ansible.posix.firewalld:
     port: "{{ cadvisor_port }}/tcp"
