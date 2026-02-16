@@ -28,10 +28,10 @@ grafana_plugins: []
 grafana_install_dashboards: true
 grafana_dashboards:
   - name: "node-exporter-full"
-    url: "https://grafana.com/api/dashboards/1860/revisions/31/download"
-  - name: "docker-container-metrics"
-    url: "https://grafana.com/api/dashboards/193/revisions/5/download"
+    url: "https://grafana.com/api/dashboards/1860/revisions/37/download"
+  - name: "cadvisor-exporter"
+    url: "https://grafana.com/api/dashboards/14282/revisions/1/download"
 
 # Firewall configuration
-grafana_configure_firewall: true
+grafana_configure_firewall: false
 grafana_firewall_zone: "public"
