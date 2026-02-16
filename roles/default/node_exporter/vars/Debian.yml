@@ -1,3 +1,5 @@
 ---
 # vars file for node_exporter - Debian family
-# No OS-specific variables needed
+
+# No OS-specific variables needed for Debian
+# Architecture detection is in vars/main.yml

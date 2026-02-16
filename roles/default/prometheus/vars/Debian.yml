@@ -1,3 +1,4 @@
 ---
 # vars file for prometheus - Debian family
-# No OS-specific variables needed
+
+# No OS-specific variables needed for Prometheus (runs in Docker)
