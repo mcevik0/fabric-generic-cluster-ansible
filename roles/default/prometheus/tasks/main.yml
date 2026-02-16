@@ -104,6 +104,6 @@
 
 - name: Display Prometheus status
   ansible.builtin.debug:
-    msg: "Prometheus is running on http://{{ ansible_default_ipv4.address }}:{{ prometheus_port }}"
+    msg: "Prometheus is running on http://{{ ansible_host }}:{{ prometheus_port }}"
   when: prometheus_health.status == 200
   tags: prometheus-verify

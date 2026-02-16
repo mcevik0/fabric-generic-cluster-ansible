@@ -76,7 +76,7 @@
       GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_INSTALL_PLUGINS: "{{ grafana_plugins | join(',') }}"
-      GF_SERVER_ROOT_URL: "http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}"
+      GF_SERVER_ROOT_URL: "http://{{ ansible_host }}:{{ grafana_port }}"
   tags: grafana
 
 - name: Install firewall Python library (RedHat)
@@ -112,7 +112,7 @@
 - name: Display Grafana access information
   ansible.builtin.debug:
     msg:
-      - "Grafana is running on http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}"
+      - "Grafana is running on http://{{ ansible_host }}:{{ grafana_port }}"
       - "Username: {{ grafana_admin_user }}"
       - "Password: {{ grafana_admin_password }}"
   when: grafana_health.status == 200
