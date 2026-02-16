@@ -33,5 +33,5 @@ grafana_dashboards:
     url: "https://grafana.com/api/dashboards/14282/revisions/1/download"
 
 # Firewall configuration
-grafana_configure_firewall: false
+grafana_configure_firewall: true
 grafana_firewall_zone: "public"

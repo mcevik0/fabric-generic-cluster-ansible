@@ -19,6 +19,8 @@
     path: "{{ item }}"
     state: directory
     mode: '0755'
+    owner: '472'
+    group: '472'
   loop:
     - "{{ grafana_data_dir }}"
     - "{{ grafana_config_dir }}"
@@ -33,6 +35,8 @@
     src: datasource-prometheus.yml.j2
     dest: "{{ grafana_config_dir }}/provisioning/datasources/prometheus.yml"
     mode: '0644'
+    owner: '472'
+    group: '472'
   notify: restart grafana
   tags: grafana
 
@@ -41,6 +45,8 @@
     src: dashboard-provider.yml.j2
     dest: "{{ grafana_config_dir }}/provisioning/dashboards/default.yml"
     mode: '0644'
+    owner: '472'
+    group: '472'
   notify: restart grafana
   tags: grafana
 
@@ -49,6 +55,8 @@
     url: "{{ item.url }}"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}.json"
     mode: '0644'
+    owner: '472'
+    group: '472'
   loop: "{{ grafana_dashboards }}"
   when: grafana_install_dashboards | bool
   tags: grafana
