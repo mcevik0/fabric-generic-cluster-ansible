@@ -1,0 +1,37 @@
+---
+# defaults file for grafana
+
+# Docker image and version
+grafana_image: "grafana/grafana"
+grafana_version: "10.2.3"
+
+# Port configuration
+grafana_port: 3000
+
+# Directory configuration
+grafana_data_dir: /var/lib/grafana
+grafana_config_dir: /etc/grafana
+grafana_dashboards_dir: /var/lib/grafana/dashboards
+
+# Admin credentials
+grafana_admin_user: admin
+grafana_admin_password: admin  # CHANGE THIS IN PRODUCTION!
+
+# Prometheus datasource configuration
+grafana_prometheus_url: "http://localhost:9090"
+grafana_prometheus_name: "Prometheus"
+
+# Plugins to install
+grafana_plugins: []
+
+# Pre-built dashboards to install
+grafana_install_dashboards: true
+grafana_dashboards:
+  - name: "node-exporter-full"
+    url: "https://grafana.com/api/dashboards/1860/revisions/37/download"
+  - name: "cadvisor-exporter"
+    url: "https://grafana.com/api/dashboards/14282/revisions/1/download"
+
+# Firewall configuration
+grafana_configure_firewall: true
+grafana_firewall_zone: "public"

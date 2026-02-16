@@ -57,6 +57,27 @@ lc-10 ansible_host=10.133.130.2 ansible_user=rocky
 lc-10 ansible_host=10.133.130.2 ansible_user=rocky
 lc-30 ansible_host=10.134.2.2 ansible_user=debian
 
+
+# ============================================
+# MONITORING
+# ============================================
+[nodes_monitoring]
+lc-10
+lc-20
+lc-30
+
+[nodes_compute]
+lc-11
+lc-21
+lc-31
+
+[all_nodes:children]
+nodes_monitoring
+nodes_compute
+nodes_webserver
+nodes_loadbalancer
+nodes_database
+
 # ============================================
 # GLOBAL VARIABLES
 # ============================================

@@ -1,0 +1,20 @@
+---
+# handlers file for prometheus
+
+- name: reload prometheus
+  community.docker.docker_container_exec:
+    container: prometheus
+    command: /bin/killall -HUP prometheus
+  ignore_errors: true
+
+- name: restart prometheus
+  community.docker.docker_container:
+    name: prometheus
+    state: started
+    restart: true
+
+- name: reload firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+  when: ansible_os_family == "RedHat"

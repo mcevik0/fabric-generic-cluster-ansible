@@ -1,0 +1,14 @@
+---
+# handlers file for grafana
+
+- name: restart grafana
+  community.docker.docker_container:
+    name: grafana
+    state: started
+    restart: true
+
+- name: reload firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,115 @@
+---
+# tasks file for prometheus
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+  tags: always
+
+- name: Ensure Docker is installed
+  ansible.builtin.service:
+    name: docker
+    state: started
+  tags: always
+
+- name: Create Prometheus directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: nobody
+    group: nobody
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_data_dir }}"
+    - "{{ prometheus_config_dir }}/rules"
+  tags: prometheus
+
+- name: Generate Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    mode: '0644'
+    owner: nobody
+    group: nobody
+  notify: reload prometheus
+  tags: prometheus
+
+- name: Copy alert rules
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ prometheus_config_dir }}/rules/{{ item | basename | regex_replace('.j2$', '') }}"
+    mode: '0644'
+    owner: nobody
+    group: nobody
+  with_fileglob:
+    - ../templates/rules/*.j2
+  notify: reload prometheus
+  when: prometheus_enable_alerting | bool
+  tags: prometheus
+
+- name: Pull Prometheus Docker image
+  community.docker.docker_image:
+    name: "{{ prometheus_image }}"
+    tag: "{{ prometheus_version }}"
+    source: pull
+  tags: prometheus
+
+- name: Run Prometheus container
+  community.docker.docker_container:
+    name: prometheus
+    image: "{{ prometheus_image }}:{{ prometheus_version }}"
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "{{ prometheus_port }}:9090"
+    volumes:
+      - "{{ prometheus_config_dir }}:/etc/prometheus:ro"
+      - "{{ prometheus_data_dir }}:/prometheus"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time={{ prometheus_retention_time }}"
+      - "--storage.tsdb.retention.size={{ prometheus_retention_size }}"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+  tags: prometheus
+
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - prometheus_configure_firewall | bool
+  tags: prometheus
+
+- name: Configure firewall for Prometheus
+  ansible.posix.firewalld:
+    port: "{{ prometheus_port }}/tcp"
+    permanent: true
+    state: enabled
+    zone: "{{ prometheus_firewall_zone }}"
+  when: 
+    - ansible_os_family == "RedHat"
+    - prometheus_configure_firewall | bool
+  notify: reload firewalld
+  tags: prometheus
+
+- name: Wait for Prometheus to be ready
+  ansible.builtin.uri:
+    url: "http://localhost:{{ prometheus_port }}/-/ready"
+    status_code: 200
+  register: prometheus_health
+  retries: 10
+  delay: 5
+  tags: prometheus-verify
+
+- name: Display Prometheus status
+  ansible.builtin.debug:
+    msg: "Prometheus is running on http://{{ ansible_host }}:{{ prometheus_port }}"
+  when: prometheus_health.status == 200
+  tags: prometheus-verify

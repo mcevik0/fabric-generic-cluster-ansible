@@ -1,0 +1,4 @@
+---
+# vars file for grafana - Debian family
+
+# No OS-specific variables needed for Grafana (runs in Docker)

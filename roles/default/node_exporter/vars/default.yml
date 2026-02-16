@@ -1,0 +1,5 @@
+---
+# vars file for node_exporter - default
+
+# Default fallback variables if OS-specific vars are not found
+# Architecture detection is in vars/main.yml

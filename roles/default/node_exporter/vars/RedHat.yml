@@ -1,0 +1,5 @@
+---
+# vars file for node_exporter - RedHat family
+
+# No OS-specific variables needed for RedHat
+# Architecture detection is in vars/main.yml

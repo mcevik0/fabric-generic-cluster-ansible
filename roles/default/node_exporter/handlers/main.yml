@@ -1,0 +1,17 @@
+---
+# handlers file for node_exporter
+
+- name: daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart node_exporter
+  ansible.builtin.service:
+    name: node_exporter
+    state: restarted
+
+- name: reload firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+  when: ansible_os_family == "RedHat"

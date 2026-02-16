@@ -1,0 +1,63 @@
+---
+# playbook_monitoring.yml
+# Deploy comprehensive monitoring stack across FABRIC cluster
+
+- name: Deploy Node Exporter and cAdvisor on all nodes
+  hosts: all_nodes
+  become: true
+  gather_facts: true
+  
+  pre_tasks:
+    - name: Display deployment information
+      ansible.builtin.debug:
+        msg:
+          - "======================================"
+          - "Deploying Monitoring Agents"
+          - "Target hosts: {{ ansible_play_hosts | length }} nodes"
+          - "======================================"
+      run_once: true
+      tags: always
+
+  roles:
+    - role: node_exporter
+      when: deploy_node_exporter | default(true)
+    
+    - role: cadvisor
+      when: deploy_cadvisor | default(true)
+
+- name: Deploy Prometheus and Grafana on monitoring servers
+  hosts: nodes_monitoring
+  become: true
+  gather_facts: true
+  
+  pre_tasks:
+    - name: Display monitoring server information
+      ansible.builtin.debug:
+        msg:
+          - "======================================"
+          - "Deploying Monitoring Stack"
+          - "Prometheus + Grafana on {{ ansible_play_hosts | length }} servers"
+          - "======================================"
+      run_once: true
+      tags: always
+
+  roles:
+    - role: prometheus
+      when: deploy_prometheus | default(true)
+    
+    - role: grafana
+      when: deploy_grafana | default(true)
+
+  post_tasks:
+    - name: Display access information
+      ansible.builtin.debug:
+        msg:
+          - "======================================"
+          - "Monitoring Stack Deployed Successfully!"
+          - "Node: {{ inventory_hostname }}"
+          - "Prometheus: http://{{ ansible_host }}:9090"
+          - "Grafana: http://{{ ansible_host }}:3000"
+          - "  Username: {{ grafana_admin_user | default('admin') }}"
+          - "  Password: {{ grafana_admin_password | default('admin') }}"
+          - "======================================"
+      tags: always

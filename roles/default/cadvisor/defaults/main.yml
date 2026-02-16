@@ -1,0 +1,19 @@
+---
+# defaults file for cadvisor
+
+# Docker image and version
+cadvisor_image: "gcr.io/cadvisor/cadvisor"
+cadvisor_version: "v0.49.1"
+
+# Port configuration
+cadvisor_port: 8080
+
+# Data directory
+cadvisor_data_dir: /var/lib/cadvisor
+
+# Additional command arguments
+cadvisor_extra_args: []
+
+# Firewall configuration
+cadvisor_configure_firewall: true
+cadvisor_firewall_zone: "public"

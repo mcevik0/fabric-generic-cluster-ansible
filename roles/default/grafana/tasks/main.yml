@@ -1,0 +1,127 @@
+---
+# tasks file for grafana
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+  tags: always
+
+- name: Ensure Docker is installed
+  ansible.builtin.service:
+    name: docker
+    state: started
+  tags: always
+
+- name: Create Grafana directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: '472'
+    group: '472'
+  loop:
+    - "{{ grafana_data_dir }}"
+    - "{{ grafana_config_dir }}"
+    - "{{ grafana_config_dir }}/provisioning"
+    - "{{ grafana_config_dir }}/provisioning/datasources"
+    - "{{ grafana_config_dir }}/provisioning/dashboards"
+    - "{{ grafana_dashboards_dir }}"
+  tags: grafana
+
+- name: Configure Grafana datasources
+  ansible.builtin.template:
+    src: datasource-prometheus.yml.j2
+    dest: "{{ grafana_config_dir }}/provisioning/datasources/prometheus.yml"
+    mode: '0644'
+    owner: '472'
+    group: '472'
+  notify: restart grafana
+  tags: grafana
+
+- name: Configure Grafana dashboard provider
+  ansible.builtin.template:
+    src: dashboard-provider.yml.j2
+    dest: "{{ grafana_config_dir }}/provisioning/dashboards/default.yml"
+    mode: '0644'
+    owner: '472'
+    group: '472'
+  notify: restart grafana
+  tags: grafana
+
+- name: Download pre-built dashboards
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}.json"
+    mode: '0644'
+    owner: '472'
+    group: '472'
+  loop: "{{ grafana_dashboards }}"
+  when: grafana_install_dashboards | bool
+  tags: grafana
+
+- name: Pull Grafana Docker image
+  community.docker.docker_image:
+    name: "{{ grafana_image }}"
+    tag: "{{ grafana_version }}"
+    source: pull
+  tags: grafana
+
+- name: Run Grafana container
+  community.docker.docker_container:
+    name: grafana
+    image: "{{ grafana_image }}:{{ grafana_version }}"
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "{{ grafana_port }}:3000"
+    volumes:
+      - "{{ grafana_data_dir }}:/var/lib/grafana"
+      - "{{ grafana_config_dir }}/provisioning:/etc/grafana/provisioning"
+      - "{{ grafana_dashboards_dir }}:/var/lib/grafana/dashboards"
+    env:
+      GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+      GF_INSTALL_PLUGINS: "{{ grafana_plugins | join(',') }}"
+      GF_SERVER_ROOT_URL: "http://{{ ansible_host }}:{{ grafana_port }}"
+  tags: grafana
+
+- name: Install firewall Python library (RedHat)
+  ansible.builtin.dnf:
+    name: python3-firewall
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - grafana_configure_firewall | bool
+  tags: grafana
+
+- name: Configure firewall for Grafana
+  ansible.posix.firewalld:
+    port: "{{ grafana_port }}/tcp"
+    permanent: true
+    state: enabled
+    zone: "{{ grafana_firewall_zone }}"
+  when: 
+    - ansible_os_family == "RedHat"
+    - grafana_configure_firewall | bool
+  notify: reload firewalld
+  tags: grafana
+
+- name: Wait for Grafana to be ready
+  ansible.builtin.uri:
+    url: "http://localhost:{{ grafana_port }}/api/health"
+    status_code: 200
+  register: grafana_health
+  retries: 15
+  delay: 5
+  tags: grafana-verify
+
+- name: Display Grafana access information
+  ansible.builtin.debug:
+    msg:
+      - "Grafana is running on http://{{ ansible_host }}:{{ grafana_port }}"
+      - "Username: {{ grafana_admin_user }}"
+      - "Password: {{ grafana_admin_password }}"
+  when: grafana_health.status == 200
+  tags: grafana-verify

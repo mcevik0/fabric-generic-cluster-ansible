@@ -1,0 +1,20 @@
+---
+# defaults file for node_exporter
+
+# Version to install
+node_exporter_version: "latest"
+node_exporter_force_install: false
+
+# Port configuration
+node_exporter_port: 9100
+
+# Collectors to enable (default enables most useful collectors)
+node_exporter_enabled_collectors:
+  - systemd
+  - textfile:directory=/var/lib/node_exporter/textfile_collector
+
+node_exporter_disabled_collectors: []
+
+# Firewall configuration
+node_exporter_configure_firewall: true
+node_exporter_firewall_zone: "public"
