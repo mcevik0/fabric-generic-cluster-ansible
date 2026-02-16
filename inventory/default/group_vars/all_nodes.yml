@@ -43,3 +43,15 @@ log_retention_days: 30
 # Environment
 deployment_environment: "production"
 cluster_name: "fabric-cluster"
+
+#
+# Monitoring
+#
+
+# Monitoring configuration
+deploy_node_exporter: true
+deploy_cadvisor: true
+
+# Disable firewall auto-configuration
+node_exporter_configure_firewall: false
+cadvisor_configure_firewall: false

@@ -1,0 +1,12 @@
+# Prometheus configuration
+deploy_prometheus: true
+prometheus_retention_time: "30d"
+prometheus_retention_size: "20GB"
+prometheus_configure_firewall: false
+
+# Grafana configuration
+deploy_grafana: true
+grafana_admin_user: admin
+grafana_admin_password: "CHANGE_ME_NOW"  # IMPORTANT: Set a secure password!
+grafana_configure_firewall: false
+grafana_install_dashboards: true
