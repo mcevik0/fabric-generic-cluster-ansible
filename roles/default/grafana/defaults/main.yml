@@ -41,8 +41,8 @@ grafana_install_dashboards: true
 grafana_dashboards:
   - name: "node-exporter-full"
     id: 1860
-  - name: "cadvisor-docker"
-    id: 19908
+  - name: "cadvisor-docker-node-selection"
+    id: 8321
 
 # Firewall configuration
 grafana_configure_firewall: true
