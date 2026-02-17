@@ -29,8 +29,8 @@ grafana_install_dashboards: true
 grafana_dashboards:
   - name: "node-exporter-full"
     url: "https://grafana.com/api/dashboards/1860/revisions/37/download"
-  - name: "cadvisor-exporter"
-    url: "https://grafana.com/api/dashboards/14282/revisions/1/download"
+  - name: "cadvisor-docker"
+    url: "https://grafana.com/api/dashboards/893/revisions/7/download"
 
 # Firewall configuration
 grafana_configure_firewall: true
