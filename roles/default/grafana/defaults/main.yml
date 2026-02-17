@@ -18,7 +18,8 @@ grafana_admin_user: admin
 grafana_admin_password: admin  # CHANGE THIS IN PRODUCTION!
 
 # Prometheus datasource configuration
-grafana_prometheus_url: "http://localhost:9090"
+# Use ansible_host so Grafana container can reach Prometheus on the host
+grafana_prometheus_url: "http://{{ ansible_host }}:9090"
 grafana_prometheus_name: "Prometheus"
 
 # Plugins to install

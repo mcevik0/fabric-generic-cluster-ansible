@@ -50,6 +50,25 @@
   notify: restart grafana
   tags: grafana
 
+- name: Find existing dashboard files
+  ansible.builtin.find:
+    paths: "{{ grafana_dashboards_dir }}"
+    patterns: "*.json"
+  register: existing_dashboards
+  when: grafana_install_dashboards | bool
+  tags: grafana
+
+- name: Remove dashboards no longer in configuration
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ existing_dashboards.files }}"
+  when:
+    - grafana_install_dashboards | bool
+    - item.path | basename | regex_replace('.json$', '') not in grafana_dashboards | map(attribute='name') | list
+  notify: restart grafana
+  tags: grafana
+
 - name: Download pre-built dashboards
   ansible.builtin.get_url:
     url: "{{ item.url }}"
@@ -57,8 +76,10 @@
     mode: '0644'
     owner: '472'
     group: '472'
+    force: true
   loop: "{{ grafana_dashboards }}"
   when: grafana_install_dashboards | bool
+  notify: restart grafana
   tags: grafana
 
 - name: Pull Grafana Docker image
