@@ -47,13 +47,13 @@ lc-31 ansible_host=10.134.2.3 ansible_user=rocky
 # ============================================
 # CUSTOM GROUPS
 # ============================================
-[nodes_database]
+[role_database]
 lc-20 ansible_host=10.137.5.2 ansible_user=ubuntu
 
-[nodes_loadbalancer]
+[role_loadbalancer]
 lc-10 ansible_host=10.133.130.2 ansible_user=rocky
 
-[nodes_webserver]
+[role_webserver]
 lc-10 ansible_host=10.133.130.2 ansible_user=rocky
 lc-30 ansible_host=10.134.2.2 ansible_user=debian
 
@@ -61,22 +61,22 @@ lc-30 ansible_host=10.134.2.2 ansible_user=debian
 # ============================================
 # MONITORING
 # ============================================
-[nodes_monitoring]
+[role_monitoring]
 lc-10
 lc-20
 lc-30
 
-[nodes_compute]
+[role_compute]
 lc-11
 lc-21
 lc-31
 
 [all_nodes:children]
-nodes_monitoring
-nodes_compute
-nodes_webserver
-nodes_loadbalancer
-nodes_database
+role_monitoring
+role_compute
+role_webserver
+role_loadbalancer
+role_database
 
 # ============================================
 # GLOBAL VARIABLES
