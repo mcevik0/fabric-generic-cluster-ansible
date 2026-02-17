@@ -22,6 +22,16 @@ grafana_admin_password: admin  # CHANGE THIS IN PRODUCTION!
 grafana_prometheus_url: "http://{{ ansible_host }}:9090"
 grafana_prometheus_name: "Prometheus"
 
+# Datasource placeholder patterns found in downloaded dashboards.
+# These are replaced with the actual datasource name after download.
+grafana_datasource_placeholders:
+  - regexp: '\$\{DS_PROMETHEUS\}'
+    replace: "{{ grafana_prometheus_name }}"
+  - regexp: '\$\{DS_PROMETHEUS_DATASOURCE\}'
+    replace: "{{ grafana_prometheus_name }}"
+  - regexp: '"datasource": "Prometheus"'
+    replace: '"datasource": "{{ grafana_prometheus_name }}"'
+
 # Plugins to install
 grafana_plugins: []
 

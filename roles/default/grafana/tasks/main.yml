@@ -91,6 +91,18 @@
   notify: restart grafana
   tags: grafana
 
+- name: Replace datasource placeholder in dashboards
+  ansible.builtin.replace:
+    path: "{{ grafana_dashboards_dir }}/{{ item.0.item.name }}.json"
+    regexp: "{{ item.1.regexp }}"
+    replace: "{{ item.1.replace }}"
+    owner: '472'
+    group: '472'
+  loop: "{{ grafana_dashboard_meta.results | product(grafana_datasource_placeholders) | list }}"
+  when: grafana_install_dashboards | bool
+  notify: restart grafana
+  tags: grafana
+
 - name: Pull Grafana Docker image
   community.docker.docker_image:
     name: "{{ grafana_image }}"
