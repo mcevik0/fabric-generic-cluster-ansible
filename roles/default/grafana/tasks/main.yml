@@ -69,15 +69,24 @@
   notify: restart grafana
   tags: grafana
 
-- name: Download pre-built dashboards
+- name: Resolve latest revision for each dashboard
+  ansible.builtin.uri:
+    url: "https://grafana.com/api/dashboards/{{ item.id }}"
+    return_content: true
+  register: grafana_dashboard_meta
+  loop: "{{ grafana_dashboards }}"
+  when: grafana_install_dashboards | bool
+  tags: grafana
+
+- name: Download pre-built dashboards (latest revision)
   ansible.builtin.get_url:
-    url: "{{ item.url }}"
-    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}.json"
+    url: "https://grafana.com/api/dashboards/{{ item.item.id }}/revisions/{{ (item.content | from_json).revision }}/download"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.item.name }}.json"
     mode: '0644'
     owner: '472'
     group: '472'
     force: true
-  loop: "{{ grafana_dashboards }}"
+  loop: "{{ grafana_dashboard_meta.results }}"
   when: grafana_install_dashboards | bool
   notify: restart grafana
   tags: grafana

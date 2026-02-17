@@ -26,12 +26,13 @@ grafana_prometheus_name: "Prometheus"
 grafana_plugins: []
 
 # Pre-built dashboards to install
+# Uses dashboard IDs - the role automatically fetches the latest revision
 grafana_install_dashboards: true
 grafana_dashboards:
   - name: "node-exporter-full"
-    url: "https://grafana.com/api/dashboards/1860/revisions/37/download"
+    id: 1860
   - name: "cadvisor-docker"
-    url: "https://grafana.com/api/dashboards/893/revisions/7/download"
+    id: 19908
 
 # Firewall configuration
 grafana_configure_firewall: true
