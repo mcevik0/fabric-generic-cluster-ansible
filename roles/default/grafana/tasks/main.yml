@@ -103,6 +103,18 @@
   notify: restart grafana
   tags: grafana
 
+- name: Copy local dashboards shipped with role
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}.json"
+    mode: '0644'
+    owner: '472'
+    group: '472'
+  loop: "{{ grafana_local_dashboards | default([]) }}"
+  when: grafana_install_dashboards | bool
+  notify: restart grafana
+  tags: grafana
+
 - name: Pull Grafana Docker image
   community.docker.docker_image:
     name: "{{ grafana_image }}"

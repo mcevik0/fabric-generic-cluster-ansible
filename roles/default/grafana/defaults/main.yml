@@ -36,13 +36,15 @@ grafana_datasource_placeholders:
 grafana_plugins: []
 
 # Pre-built dashboards to install
-# Uses dashboard IDs - the role automatically fetches the latest revision
+# node-exporter-full fetched from Grafana.com (latest revision auto-resolved)
+# cadvisor dashboard is custom-built and shipped with the role (uses exact label names)
 grafana_install_dashboards: true
 grafana_dashboards:
   - name: "node-exporter-full"
     id: 1860
-  - name: "cadvisor-docker-node-selection"
-    id: 8321
+grafana_local_dashboards:
+  - name: "cadvisor-container-metrics"
+    src: "cadvisor-dashboard.json"
 
 # Firewall configuration
 grafana_configure_firewall: true
