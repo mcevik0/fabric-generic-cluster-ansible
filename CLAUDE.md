@@ -6,6 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ansible automation for managing [FABRIC](https://fabric-testbed.net/) cluster nodes — base OS configuration and an optional monitoring stack (Prometheus + Grafana + Node Exporter + cAdvisor). Targets heterogeneous nodes running Rocky Linux, Ubuntu, or Debian across multiple FABRIC sites.
 
+## Workflow
+
+All code changes must be made on a new branch, not directly on `main`. For every change:
+1. Create a new branch
+2. Make the changes and commit
+3. Push the branch and open a PR
+4. Merge the PR into `main`
+
 ## Setup
 
 Install required Galaxy collections:
