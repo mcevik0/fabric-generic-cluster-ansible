@@ -1,0 +1,63 @@
+---
+# roles/default/ollama/tasks/configure.yml
+# Configure Ollama to listen on all interfaces for remote FABRIC slice access
+
+- name: Create systemd override directory for Ollama
+  ansible.builtin.file:
+    path: "{{ ollama_service_override_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  tags: ollama, configure
+
+- name: Deploy systemd override to bind Ollama to all interfaces
+  ansible.builtin.template:
+    src: ollama_override.conf.j2
+    dest: "{{ ollama_service_override_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - reload systemd
+    - restart ollama
+  tags: ollama, configure
+
+- name: Flush handlers to apply systemd and service changes
+  ansible.builtin.meta: flush_handlers
+  tags: ollama, configure
+
+- name: Enable Ollama service to start on boot
+  ansible.builtin.systemd:
+    name: "{{ ollama_service_name }}"
+    enabled: true
+    daemon_reload: true
+  tags: ollama, configure
+
+- name: Ensure Ollama service is running
+  ansible.builtin.systemd:
+    name: "{{ ollama_service_name }}"
+    state: started
+  tags: ollama, configure
+
+- name: Wait for Ollama API to become available
+  ansible.builtin.wait_for:
+    host: localhost
+    port: "{{ ollama_port }}"
+    timeout: 60
+    delay: 5
+  tags: ollama, configure
+
+- name: Test Ollama API is responding
+  ansible.builtin.uri:
+    url: "http://localhost:{{ ollama_port }}/api/tags"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: ollama_api_test
+  tags: ollama, configure
+
+- name: Display Ollama API test result
+  ansible.builtin.debug:
+    msg: "Ollama API is accessible at http://localhost:{{ ollama_port }}"
+  tags: ollama, configure

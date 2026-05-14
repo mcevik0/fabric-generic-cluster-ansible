@@ -1,0 +1,35 @@
+---
+# roles/default/ollama/tasks/install.yml
+# Install Ollama native binary via the official installer script
+
+- name: Install zstd (required by Ollama installer on Rocky 9)
+  ansible.builtin.dnf:
+    name: zstd
+    state: "{{ ollama_package_state }}"
+  tags: ollama, install
+
+- name: Check if Ollama is already installed
+  ansible.builtin.command:
+    cmd: which ollama
+  register: ollama_which
+  changed_when: false
+  failed_when: false
+  tags: ollama, install
+
+- name: Download and run Ollama official installer
+  ansible.builtin.shell:
+    cmd: "curl -fsSL {{ ollama_install_script_url }} | sh"
+  when: ollama_which.rc != 0
+  tags: ollama, install
+
+- name: Verify Ollama binary is available
+  ansible.builtin.command:
+    cmd: ollama --version
+  register: ollama_version
+  changed_when: false
+  tags: ollama, install
+
+- name: Display installed Ollama version
+  ansible.builtin.debug:
+    msg: "Ollama version: {{ ollama_version.stdout }}"
+  tags: ollama, install

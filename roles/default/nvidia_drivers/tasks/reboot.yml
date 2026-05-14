@@ -1,0 +1,21 @@
+---
+# roles/default/nvidia_drivers/tasks/reboot.yml
+# Reboot the node and wait for SSH to reconnect
+# The NVIDIA kernel module is only loaded after a reboot
+
+- name: Reboot to load NVIDIA kernel module
+  ansible.builtin.reboot:
+    msg: "Rebooting to load NVIDIA kernel module after driver installation"
+    reboot_timeout: "{{ nvidia_reboot_timeout }}"
+    connect_timeout: 20
+    pre_reboot_delay: 5
+    post_reboot_delay: 30
+    test_command: uptime
+  tags: nvidia, reboot
+
+- name: Confirm SSH is available after reboot
+  ansible.builtin.wait_for_connection:
+    timeout: "{{ nvidia_reboot_timeout }}"
+    delay: 10
+    sleep: 10
+  tags: nvidia, reboot

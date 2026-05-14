@@ -1,0 +1,21 @@
+---
+# roles/default/ollama/tasks/main.yml
+# Install and configure Ollama LLM server on Rocky 9 / RHEL 9
+
+- name: Install Ollama and dependencies
+  ansible.builtin.include_tasks: install.yml
+  tags: ollama, install
+
+- name: Configure Ollama for remote access
+  ansible.builtin.include_tasks: configure.yml
+  tags: ollama, configure
+
+- name: Configure firewall for Ollama API port
+  ansible.builtin.include_tasks: firewall.yml
+  when: ollama_configure_firewall | bool
+  tags: ollama, firewall
+
+- name: Pull default LLM model
+  ansible.builtin.include_tasks: model.yml
+  when: ollama_pull_model | bool
+  tags: ollama, model

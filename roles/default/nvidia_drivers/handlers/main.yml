@@ -1,0 +1,3 @@
+---
+# handlers file for nvidia_drivers
+# No handlers required — reboot is handled directly in tasks/reboot.yml

@@ -1,0 +1,69 @@
+---
+# playbooks/default/playbook_ollama.yml
+# Deploy GPU-accelerated Ollama LLM server on FABRIC Rocky 9 nodes
+#
+# This playbook installs NVIDIA drivers + CUDA and then installs/configures
+# Ollama to serve LLM inference. It targets nodes in the [gpu_nodes] group.
+#
+# Usage:
+#   ansible-playbook playbooks/default/playbook_ollama.yml
+#   ansible-playbook playbooks/default/playbook_ollama.yml --tags nvidia
+#   ansible-playbook playbooks/default/playbook_ollama.yml --tags ollama
+#   ansible-playbook playbooks/default/playbook_ollama.yml -e "ollama_default_model=llama2-7b"
+#   ansible-playbook playbooks/default/playbook_ollama.yml -e "ollama_pull_model=false"
+
+- name: Deploy GPU-Accelerated Ollama LLM Server
+  hosts: gpu_nodes
+  become: yes
+
+  pre_tasks:
+    - name: Display playbook information
+      ansible.builtin.debug:
+        msg:
+          - "=============================================="
+          - "Ollama LLM Server Deployment Playbook"
+          - "Target hosts: {{ ansible_play_hosts | length }} node(s)"
+          - "Model: {{ ollama_default_model | default('deepseek-r1:7b') }}"
+          - "=============================================="
+      run_once: true
+      tags: always
+
+    - name: Gather facts if not already gathered
+      ansible.builtin.setup:
+      when: ansible_facts.keys() | length == 0
+      tags: always
+
+    - name: Verify target is Rocky 9 / RHEL 9
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == "RedHat"
+          - ansible_distribution_major_version == "9"
+        fail_msg: >
+          This playbook targets Rocky 9 / RHEL 9.
+          Detected: {{ ansible_distribution }} {{ ansible_distribution_version }}
+        success_msg: "OS check passed: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      tags: always
+
+  roles:
+    # Step 6 & 7: Install NVIDIA drivers + CUDA, reboot, verify with nvidia-smi
+    - role: nvidia_drivers
+      tags: nvidia
+      when: install_nvidia_drivers | default(true)
+
+    # Install & configure Ollama, open firewall, pull default model
+    - role: ollama
+      tags: ollama
+      when: install_ollama | default(true)
+
+  post_tasks:
+    - name: Display Ollama access information
+      ansible.builtin.debug:
+        msg:
+          - "=============================================="
+          - "Ollama deployment completed successfully!"
+          - "Host: {{ inventory_hostname }}"
+          - "API endpoint: http://{{ ansible_host }}:{{ ollama_port | default(11434) }}"
+          - "Model: {{ ollama_default_model | default('deepseek-r1:7b') }}"
+          - "CLI usage: ollama run {{ ollama_default_model | default('deepseek-r1:7b') }} \"Your prompt\""
+          - "=============================================="
+      tags: always
