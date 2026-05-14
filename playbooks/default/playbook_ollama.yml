@@ -13,7 +13,7 @@
 #   ansible-playbook playbooks/default/playbook_ollama.yml -e "ollama_pull_model=false"
 
 - name: Deploy GPU-Accelerated Ollama LLM Server
-  hosts: gpu_nodes
+  hosts: all_nodes
   become: yes
 
   pre_tasks:
