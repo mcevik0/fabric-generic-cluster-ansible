@@ -475,6 +475,116 @@ ansible-galaxy install -r requirements.yml
 - **System updates** handles package manager differences automatically
 - **Reboot handling** requires `allow_reboot=true` to actually reboot systems
 
+---
+
+## GPU / AI Roles
+
+### nvidia_drivers
+**Purpose**: Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9
+
+**What it does** (mirrors Steps 6 & 7 of `configure-ollama-rocky9.ipynb`):
+- Enables the CodeReady Builder (CRB) repository
+- Adds the NVIDIA CUDA repository for `rhel9/x86_64`
+- Installs `cuda-toolkit`
+- Installs `epel-release` (required by `nvidia-gds`)
+- Installs `nvidia-gds` (which pulls in the open kernel module and DKMS drivers)
+- Reboots the node to load the NVIDIA kernel module
+- Waits for SSH to reconnect after reboot
+- Runs `nvidia-smi` and asserts the GPU is recognized
+
+**Tags**: `nvidia`, `cuda`, `reboot`, `verify`
+
+**Key Variables**:
+```yaml
+nvidia_cuda_distro: "rhel9"          # CUDA repo distro string
+nvidia_cuda_arch: "x86_64"           # Architecture
+nvidia_allow_reboot: true            # Reboot after driver install (required)
+nvidia_reboot_timeout: 360           # Seconds to wait for SSH after reboot
+nvidia_verify_install: true          # Run nvidia-smi verification
+nvidia_package_state: present        # present or latest
+```
+
+**Usage**:
+```bash
+# Install drivers + verify (reboots the node)
+ansible-playbook playbooks/default/playbook_ollama.yml --tags nvidia
+
+# Install without verification
+ansible-playbook playbooks/default/playbook_ollama.yml --tags nvidia --skip-tags verify
+
+# Skip reboot (not recommended — drivers won't load)
+ansible-playbook playbooks/default/playbook_ollama.yml -e "nvidia_allow_reboot=false"
+```
+
+---
+
+### ollama
+**Purpose**: Install and configure Ollama native LLM server for GPU-accelerated inference
+
+**What it does** (mirrors the "Install and Configure Ollama" section of `configure-ollama-rocky9.ipynb`):
+- Installs `zstd` (required by the Ollama installer on Rocky 9)
+- Downloads and runs the official Ollama installer (`https://ollama.com/install.sh`)
+- Creates a systemd drop-in override to bind Ollama to `0.0.0.0:11434` (enabling access from other FABRIC slices via FABNetv4)
+- Reloads systemd and restarts the Ollama service
+- Enables the Ollama service to start on boot
+- Opens port `11434/tcp` via firewalld (Rocky 9) or UFW (Debian)
+- Pulls the configured default LLM model (uses `async` for large downloads)
+- Verifies the API is responding at `http://localhost:11434/api/tags`
+
+**Tags**: `ollama`, `install`, `configure`, `firewall`, `model`
+
+**Key Variables**:
+```yaml
+ollama_host: "0.0.0.0"              # Bind address (0.0.0.0 = all interfaces)
+ollama_port: 11434                   # Ollama API port
+ollama_default_model: "deepseek-r1:7b"  # Model to pull on install
+ollama_pull_model: true              # Set false to skip model download
+ollama_configure_firewall: true      # Open port 11434 in firewall
+ollama_firewall_zone: "public"       # firewalld zone (Rocky 9)
+```
+
+**Usage**:
+```bash
+# Full deployment (nvidia_drivers + ollama)
+ansible-playbook playbooks/default/playbook_ollama.yml
+
+# Ollama only (drivers already installed)
+ansible-playbook playbooks/default/playbook_ollama.yml --tags ollama
+
+# Use a different model
+ansible-playbook playbooks/default/playbook_ollama.yml -e "ollama_default_model=llama2-7b"
+
+# Skip model download
+ansible-playbook playbooks/default/playbook_ollama.yml --skip-tags model
+
+# Skip firewall configuration
+ansible-playbook playbooks/default/playbook_ollama.yml -e "ollama_configure_firewall=false"
+```
+
+**Inventory group**: Target nodes must belong to the `[gpu_nodes]` group.
+
+**Supported models** (set via `ollama_default_model`):
+- `deepseek-r1:7b` *(default)*
+- `deepseek-r1:67b`
+- `llama2-7b`
+- `mistral-7b`
+- `gemma-7b`
+- `phi-2`
+- Full list: https://ollama.com/search
+
+**Post-deployment access**:
+```bash
+# CLI
+ollama run deepseek-r1:7b "Tell me a joke about computer networks"
+
+# REST API (from another FABRIC slice via FABNetv4)
+curl -X POST http://<fabnetv4_ip>:11434/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"model": "deepseek-r1:7b", "prompt": "Hello!", "stream": false}'
+```
+
+---
+
 ## Support
 
 For issues or questions:
