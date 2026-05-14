@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: FABRIC Team
-  description: Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9
+  description: Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9, Ubuntu 22.04, Ubuntu 24.04
   company: FABRIC
 
   license: MIT
@@ -12,6 +12,10 @@ galaxy_info:
     - name: EL
       versions:
         - 9
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
 
   galaxy_tags:
     - nvidia

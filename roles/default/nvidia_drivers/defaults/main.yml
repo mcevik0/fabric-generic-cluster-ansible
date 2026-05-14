@@ -1,13 +1,15 @@
 ---
 # defaults file for nvidia_drivers
 
-# CUDA repository distribution and architecture (Rocky 9 / RHEL 9)
-nvidia_cuda_distro: "rhel9"
+# CUDA repository architecture
 nvidia_cuda_arch: "x86_64"
 
-# CUDA repo base URL (constructed from distro + arch)
-nvidia_cuda_repo_url: >-
-  https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_cuda_distro }}/{{ nvidia_cuda_arch }}/cuda-{{ nvidia_cuda_distro }}.repo
+# CUDA distro identifier — auto-detected in tasks/main.yml from OS facts.
+# Set explicitly to override:
+#   Rocky 9  → rhel9
+#   Ubuntu 22.04 → ubuntu2204
+#   Ubuntu 24.04 → ubuntu2404
+nvidia_cuda_distro: ""
 
 # Whether to verify the GPU after installation by running nvidia-smi
 nvidia_verify_install: true

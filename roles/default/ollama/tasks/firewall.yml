@@ -1,8 +1,8 @@
 ---
 # roles/default/ollama/tasks/firewall.yml
-# Open firewall port for the Ollama API (Rocky 9 uses firewalld)
+# Open firewall port for the Ollama API
 
-- name: Ensure firewalld is running (Rocky 9)
+- name: Ensure firewalld is running (RHEL/Rocky)
   ansible.builtin.systemd:
     name: firewalld
     state: started
@@ -10,7 +10,7 @@
   when: ansible_os_family == "RedHat"
   tags: ollama, firewall
 
-- name: Allow Ollama API port through firewall (Rocky 9 / firewalld)
+- name: Allow Ollama API port through firewall (RHEL/Rocky — firewalld)
   ansible.posix.firewalld:
     port: "{{ ollama_port }}/tcp"
     zone: "{{ ollama_firewall_zone }}"
@@ -20,7 +20,15 @@
   when: ansible_os_family == "RedHat"
   tags: ollama, firewall
 
-- name: Allow Ollama API port through firewall (Debian / ufw)
+- name: Ensure ufw is installed and enabled (Ubuntu/Debian)
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+  tags: ollama, firewall
+
+- name: Allow Ollama API port through firewall (Ubuntu/Debian — ufw)
   community.general.ufw:
     rule: allow
     port: "{{ ollama_port }}"

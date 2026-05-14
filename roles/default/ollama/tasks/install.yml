@@ -2,10 +2,23 @@
 # roles/default/ollama/tasks/install.yml
 # Install Ollama native binary via the official installer script
 
-- name: Install zstd (required by Ollama installer on Rocky 9)
+- name: Install Ollama dependencies (RHEL/Rocky)
   ansible.builtin.dnf:
-    name: zstd
+    name:
+      - zstd
+      - curl
     state: "{{ ollama_package_state }}"
+  when: ansible_os_family == "RedHat"
+  tags: ollama, install
+
+- name: Install Ollama dependencies (Ubuntu/Debian)
+  ansible.builtin.apt:
+    name:
+      - zstd
+      - curl
+    state: "{{ ollama_package_state }}"
+    update_cache: true
+  when: ansible_os_family == "Debian"
   tags: ollama, install
 
 - name: Check if Ollama is already installed

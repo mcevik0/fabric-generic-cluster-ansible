@@ -1,15 +1,40 @@
 ---
 # roles/default/nvidia_drivers/tasks/main.yml
-# Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9
+# Install NVIDIA drivers and CUDA toolkit — Rocky 9 / RHEL 9, Ubuntu 22.04, Ubuntu 24.04
 
-- name: Verify OS is RedHat family
-  ansible.builtin.fail:
-    msg: "The nvidia_drivers role only supports RedHat family systems (Rocky 9 / RHEL 9)"
-  when: ansible_os_family != "RedHat"
+- name: Auto-detect CUDA distro identifier (RHEL/Rocky)
+  ansible.builtin.set_fact:
+    nvidia_cuda_distro: "rhel{{ ansible_distribution_major_version }}"
+  when:
+    - ansible_os_family == "RedHat"
+    - not nvidia_cuda_distro
   tags: nvidia
 
-- name: Install NVIDIA drivers and CUDA toolkit
+- name: Auto-detect CUDA distro identifier (Ubuntu)
+  ansible.builtin.set_fact:
+    nvidia_cuda_distro: "ubuntu{{ ansible_distribution_version | replace('.', '') }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - not nvidia_cuda_distro
+  tags: nvidia
+
+- name: Fail on unsupported OS
+  ansible.builtin.fail:
+    msg: >
+      The nvidia_drivers role supports Rocky 9 / RHEL 9, Ubuntu 22.04, and Ubuntu 24.04.
+      Detected: {{ ansible_distribution }} {{ ansible_distribution_version }}.
+      Set nvidia_cuda_distro explicitly to override auto-detection.
+  when: not nvidia_cuda_distro
+  tags: nvidia
+
+- name: Install NVIDIA drivers and CUDA toolkit (RHEL/Rocky)
   ansible.builtin.include_tasks: install_cuda.yml
+  when: ansible_os_family == "RedHat"
+  tags: nvidia, cuda
+
+- name: Install NVIDIA drivers and CUDA toolkit (Ubuntu)
+  ansible.builtin.include_tasks: install_cuda_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
   tags: nvidia, cuda
 
 - name: Reboot to load NVIDIA kernel module
