@@ -1,0 +1,32 @@
+---
+# defaults file for ollama
+
+# Network binding — 0.0.0.0 allows connections from other FABRIC slices via FABNetv4
+ollama_host: "0.0.0.0"
+ollama_port: 11434
+
+# Default LLM model to pull after installation
+# Alternatives: llama2-7b, mistral-7b, gemma-7b, deepseek-r1:67b, phi-2, gpt-neo-2.7b
+# Full list: https://ollama.com/search
+ollama_default_model: "deepseek-r1:7b"
+
+# Whether to pull the default model during installation
+# Set to false to skip the (potentially slow) model download
+ollama_pull_model: true
+
+# Whether to open the firewall for the Ollama API port
+ollama_configure_firewall: true
+ollama_firewall_zone: "public"
+
+# Ollama installer URL
+ollama_install_script_url: "https://ollama.com/install.sh"
+
+# Package state for dependencies
+ollama_package_state: present
+
+# Systemd service name
+ollama_service_name: "ollama"
+
+# Path for the systemd drop-in override
+ollama_service_override_dir: "/etc/systemd/system/ollama.service.d"
+ollama_service_override_file: "{{ ollama_service_override_dir }}/override.conf"

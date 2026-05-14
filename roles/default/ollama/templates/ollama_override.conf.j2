@@ -1,0 +1,6 @@
+# Managed by Ansible — do not edit manually
+# Systemd drop-in override for Ollama service
+# Binds Ollama to all interfaces so it is reachable from other FABRIC slices via FABNetv4
+
+[Service]
+Environment="OLLAMA_HOST={{ ollama_host }}:{{ ollama_port }}"

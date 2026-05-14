@@ -1,0 +1,39 @@
+---
+# roles/default/nvidia_drivers/tasks/install_cuda.yml
+# Install CUDA toolkit and NVIDIA drivers on Rocky 9 / RHEL 9
+
+- name: Enable CodeReady Builder (CRB) repository
+  ansible.builtin.command:
+    cmd: dnf config-manager --set-enabled crb
+  changed_when: false
+  tags: nvidia, cuda
+
+- name: Add NVIDIA CUDA repository
+  ansible.builtin.yum_repository:
+    name: "cuda-{{ nvidia_cuda_distro }}"
+    description: "NVIDIA CUDA - {{ nvidia_cuda_distro }} ({{ nvidia_cuda_arch }})"
+    baseurl: "https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_cuda_distro }}/{{ nvidia_cuda_arch }}/"
+    gpgcheck: true
+    gpgkey: "https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_cuda_distro }}/{{ nvidia_cuda_arch }}/D42D0685.pub"
+    enabled: true
+    repo_gpgcheck: false
+  tags: nvidia, cuda
+
+- name: Install CUDA toolkit
+  ansible.builtin.dnf:
+    name: cuda-toolkit
+    state: "{{ nvidia_package_state }}"
+    update_cache: true
+  tags: nvidia, cuda
+
+- name: Install EPEL release (required by nvidia-gds)
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+  tags: nvidia, epel
+
+- name: Install nvidia-gds (pulls in drivers, DKMS, open kernel module)
+  ansible.builtin.dnf:
+    name: nvidia-gds
+    state: "{{ nvidia_package_state }}"
+  tags: nvidia, drivers

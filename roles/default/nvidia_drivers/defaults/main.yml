@@ -1,0 +1,23 @@
+---
+# defaults file for nvidia_drivers
+
+# CUDA repository distribution and architecture (Rocky 9 / RHEL 9)
+nvidia_cuda_distro: "rhel9"
+nvidia_cuda_arch: "x86_64"
+
+# CUDA repo base URL (constructed from distro + arch)
+nvidia_cuda_repo_url: >-
+  https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_cuda_distro }}/{{ nvidia_cuda_arch }}/cuda-{{ nvidia_cuda_distro }}.repo
+
+# Whether to verify the GPU after installation by running nvidia-smi
+nvidia_verify_install: true
+
+# Whether to allow the role to reboot the node after driver installation
+# Drivers require a reboot to load the kernel module
+nvidia_allow_reboot: true
+
+# How long (seconds) to wait for SSH to come back after reboot
+nvidia_reboot_timeout: 360
+
+# Package state: present or latest
+nvidia_package_state: present

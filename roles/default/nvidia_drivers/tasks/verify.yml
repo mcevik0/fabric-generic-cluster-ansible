@@ -1,0 +1,23 @@
+---
+# roles/default/nvidia_drivers/tasks/verify.yml
+# Verify GPU and CUDA installation using nvidia-smi
+
+- name: Run nvidia-smi to verify GPU is recognized
+  ansible.builtin.command:
+    cmd: nvidia-smi
+  register: nvidia_smi_output
+  changed_when: false
+  tags: nvidia, verify
+
+- name: Display nvidia-smi output
+  ansible.builtin.debug:
+    msg: "{{ nvidia_smi_output.stdout_lines }}"
+  tags: nvidia, verify
+
+- name: Verify nvidia-smi exited successfully
+  ansible.builtin.assert:
+    that:
+      - nvidia_smi_output.rc == 0
+    fail_msg: "nvidia-smi failed — GPU may not be detected or drivers did not load correctly"
+    success_msg: "GPU detected successfully via nvidia-smi"
+  tags: nvidia, verify

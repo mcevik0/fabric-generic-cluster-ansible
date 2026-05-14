@@ -1,0 +1,43 @@
+---
+# roles/default/ollama/tasks/model.yml
+# Pull the default LLM model into Ollama
+
+- name: Check if model is already available
+  ansible.builtin.command:
+    cmd: ollama list
+  register: ollama_list_output
+  changed_when: false
+  become: false
+  tags: ollama, model
+
+- name: Pull default LLM model ({{ ollama_default_model }})
+  ansible.builtin.command:
+    cmd: "ollama pull {{ ollama_default_model }}"
+  register: ollama_pull_output
+  changed_when: "'success' in ollama_pull_output.stdout | lower or ollama_pull_output.rc == 0"
+  when: ollama_default_model not in ollama_list_output.stdout
+  become: false
+  async: 1800
+  poll: 30
+  tags: ollama, model
+
+- name: List available models after pull
+  ansible.builtin.command:
+    cmd: ollama list
+  register: ollama_list_final
+  changed_when: false
+  become: false
+  tags: ollama, model
+
+- name: Display available models
+  ansible.builtin.debug:
+    msg: "{{ ollama_list_final.stdout_lines }}"
+  tags: ollama, model
+
+- name: Verify the model is in the model list
+  ansible.builtin.assert:
+    that:
+      - ollama_default_model.split(':')[0] in ollama_list_final.stdout
+    fail_msg: "Model {{ ollama_default_model }} was not found after pull"
+    success_msg: "Model {{ ollama_default_model }} is available"
+  tags: ollama, model

@@ -1,0 +1,23 @@
+---
+# roles/default/nvidia_drivers/tasks/main.yml
+# Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9
+
+- name: Verify OS is RedHat family
+  ansible.builtin.fail:
+    msg: "The nvidia_drivers role only supports RedHat family systems (Rocky 9 / RHEL 9)"
+  when: ansible_os_family != "RedHat"
+  tags: nvidia
+
+- name: Install NVIDIA drivers and CUDA toolkit
+  ansible.builtin.include_tasks: install_cuda.yml
+  tags: nvidia, cuda
+
+- name: Reboot to load NVIDIA kernel module
+  ansible.builtin.include_tasks: reboot.yml
+  when: nvidia_allow_reboot | bool
+  tags: nvidia, reboot
+
+- name: Verify GPU and CUDA installation
+  ansible.builtin.include_tasks: verify.yml
+  when: nvidia_verify_install | bool
+  tags: nvidia, verify

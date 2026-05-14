@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: FABRIC Team
+  description: Install NVIDIA drivers and CUDA toolkit on Rocky 9 / RHEL 9
+  company: FABRIC
+
+  license: MIT
+
+  min_ansible_version: "2.9"
+
+  platforms:
+    - name: EL
+      versions:
+        - 9
+
+  galaxy_tags:
+    - nvidia
+    - cuda
+    - gpu
+    - drivers
+    - fabric
+
+dependencies: []
