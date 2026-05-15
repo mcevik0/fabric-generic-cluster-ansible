@@ -14,7 +14,7 @@
     update_cache: yes
     autoremove: yes
     autoclean: yes
-  when: update_all_packages | default(true)
+  when: update_all_packages | default(true) | bool
   register: apt_update_result
   tags: updates
 
@@ -23,20 +23,20 @@
     name: "{{ packages_to_update }}"
     state: latest
   when: 
-    - not (update_all_packages | default(true))
+    - not (update_all_packages | default(true) | bool)
     - packages_to_update is defined
   tags: updates
 
 - name: Remove unused dependencies
   apt:
     autoremove: yes
-  when: autoremove | default(true)
+  when: autoremove | default(true) | bool
   tags: updates
 
 - name: Clean apt cache
   apt:
     autoclean: yes
-  when: clean_cache | default(true)
+  when: clean_cache | default(true) | bool
   tags: updates
 
 - name: Display update summary

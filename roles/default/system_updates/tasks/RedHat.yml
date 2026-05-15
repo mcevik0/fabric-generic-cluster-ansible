@@ -7,7 +7,7 @@
     name: "*"
     state: latest
     update_cache: yes
-  when: update_all_packages | default(true)
+  when: update_all_packages | default(true) | bool
   register: dnf_update_result
   tags: updates
 
@@ -22,13 +22,13 @@
     name: "{{ packages_to_update }}"
     state: latest
   when: 
-    - not (update_all_packages | default(true))
+    - not (update_all_packages | default(true) | bool)
     - packages_to_update is defined
   tags: updates
 
 - name: Clean dnf cache
   command: dnf clean all
-  when: clean_cache | default(false)
+  when: clean_cache | default(false) | bool
   changed_when: false
   tags: updates
 

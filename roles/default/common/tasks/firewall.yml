@@ -23,7 +23,7 @@
     state: started
   when: 
     - ansible_os_family == "RedHat"
-    - firewall_enabled | default(false)
+    - firewall_enabled | default(false) | bool
   tags: firewall
 
 - name: Configure firewalld - allow SSH (RedHat)
@@ -34,7 +34,7 @@
     immediate: yes
   when: 
     - ansible_os_family == "RedHat"
-    - firewall_enabled | default(false)
+    - firewall_enabled | default(false) | bool
   tags: firewall
 
 - name: Enable ufw (Debian)
@@ -43,7 +43,7 @@
     policy: deny
   when: 
     - ansible_os_family == "Debian"
-    - firewall_enabled | default(false)
+    - firewall_enabled | default(false) | bool
   tags: firewall
 
 - name: Configure ufw - allow SSH (Debian)
@@ -53,5 +53,5 @@
     proto: tcp
   when: 
     - ansible_os_family == "Debian"
-    - firewall_enabled | default(false)
+    - firewall_enabled | default(false) | bool
   tags: firewall

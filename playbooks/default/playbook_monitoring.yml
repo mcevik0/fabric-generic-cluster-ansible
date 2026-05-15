@@ -20,10 +20,10 @@
 
   roles:
     - role: node_exporter
-      when: deploy_node_exporter | default(true)
+      when: deploy_node_exporter | default(true) | bool
     
     - role: cadvisor
-      when: deploy_cadvisor | default(true)
+      when: deploy_cadvisor | default(true) | bool
 
 - name: Deploy Prometheus and Grafana on monitoring servers
   hosts: role_monitoring
@@ -43,10 +43,10 @@
 
   roles:
     - role: prometheus
-      when: deploy_prometheus | default(true)
+      when: deploy_prometheus | default(true) | bool
     
     - role: grafana
-      when: deploy_grafana | default(true)
+      when: deploy_grafana | default(true) | bool
 
   post_tasks:
     - name: Display access information
