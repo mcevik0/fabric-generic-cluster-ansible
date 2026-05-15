@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: FABRIC Team
-  description: Install and configure Ollama LLM server with GPU acceleration
+  description: Install and configure Ollama LLM server with GPU acceleration on Rocky 9, Ubuntu 22.04, Ubuntu 24.04
   company: FABRIC
 
   license: MIT
@@ -14,8 +14,8 @@ galaxy_info:
         - 9
     - name: Ubuntu
       versions:
-        - focal
         - jammy
+        - noble
 
   galaxy_tags:
     - ollama

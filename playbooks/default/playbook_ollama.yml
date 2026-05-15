@@ -1,6 +1,6 @@
 ---
 # playbooks/default/playbook_ollama.yml
-# Deploy GPU-accelerated Ollama LLM server on FABRIC Rocky 9 nodes
+# Deploy GPU-accelerated Ollama LLM server on FABRIC Rocky 9, Ubuntu 22.04, and Ubuntu 24.04 nodes
 #
 # This playbook installs NVIDIA drivers + CUDA and then installs/configures
 # Ollama to serve LLM inference. It targets nodes in the [gpu_nodes] group.
@@ -33,13 +33,14 @@
       when: ansible_facts.keys() | length == 0
       tags: always
 
-    - name: Verify target is Rocky 9 / RHEL 9
+    - name: Verify target OS is supported
       ansible.builtin.assert:
         that:
-          - ansible_os_family == "RedHat"
-          - ansible_distribution_major_version == "9"
+          - >
+            (ansible_os_family == "RedHat" and ansible_distribution_major_version == "9") or
+            (ansible_distribution == "Ubuntu" and ansible_distribution_version is version("22.04", ">="))
         fail_msg: >
-          This playbook targets Rocky 9 / RHEL 9.
+          This playbook supports Rocky 9 / RHEL 9 and Ubuntu 22.04 / 24.04.
           Detected: {{ ansible_distribution }} {{ ansible_distribution_version }}
         success_msg: "OS check passed: {{ ansible_distribution }} {{ ansible_distribution_version }}"
       tags: always
