@@ -23,3 +23,8 @@ nvidia_reboot_timeout: 360
 
 # Package state: present or latest
 nvidia_package_state: present
+
+# nvitop — interactive GPU process viewer installed in an isolated venv
+nvidia_install_nvitop: true
+nvidia_nvitop_venv: "/opt/nvitop/venv"
+nvidia_nvitop_wrapper: "/usr/local/bin/nvitop"
