@@ -1,0 +1,54 @@
+---
+# roles/default/nvidia_drivers/tasks/install_nvitop.yml
+# Install nvitop GPU monitoring tool inside a Python virtual environment
+
+- name: Install Python 3 and pip (RHEL/Rocky)
+  ansible.builtin.dnf:
+    name:
+      - python3
+      - python3-pip
+    state: present
+  when: ansible_os_family == "RedHat"
+  tags: nvidia, nvitop
+
+- name: Install Python 3, pip, and venv support (Ubuntu/Debian)
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+  tags: nvidia, nvitop
+
+- name: Install nvitop into virtual environment
+  ansible.builtin.pip:
+    name: nvitop
+    state: present
+    virtualenv: "{{ nvidia_nvitop_venv }}"
+    virtualenv_command: "python3 -m venv"
+  tags: nvidia, nvitop
+
+- name: Deploy nvitop wrapper script to system PATH
+  ansible.builtin.copy:
+    dest: "{{ nvidia_nvitop_wrapper }}"
+    content: |
+      #!/bin/bash
+      exec {{ nvidia_nvitop_venv }}/bin/nvitop "$@"
+    owner: root
+    group: root
+    mode: "0755"
+  tags: nvidia, nvitop
+
+- name: Verify nvitop is accessible
+  ansible.builtin.command:
+    cmd: "{{ nvidia_nvitop_wrapper }} --version"
+  register: nvitop_version_output
+  changed_when: false
+  tags: nvidia, nvitop
+
+- name: Display nvitop version
+  ansible.builtin.debug:
+    msg: "nvitop installed: {{ nvitop_version_output.stdout }}"
+  tags: nvidia, nvitop

@@ -18,7 +18,7 @@
     regexp: "^{{ hostvars[item].ansible_host }}.*{{ item }}"
     state: present
   loop: "{{ groups['all_nodes'] }}"
-  when: update_hosts_file | default(true)
+  when: update_hosts_file | default(true) | bool
   tags: common, hosts
 
 # RedHat-specific package installation
@@ -106,5 +106,5 @@
 
 - name: Configure firewall (basic rules)
   include_tasks: firewall.yml
-  when: configure_firewall | default(false)
+  when: configure_firewall | default(false) | bool
   tags: common, firewall

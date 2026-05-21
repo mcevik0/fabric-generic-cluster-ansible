@@ -46,3 +46,8 @@
   ansible.builtin.include_tasks: verify.yml
   when: nvidia_verify_install | bool
   tags: nvidia, verify
+
+- name: Install nvitop GPU monitoring tool
+  ansible.builtin.include_tasks: install_nvitop.yml
+  when: nvidia_install_nvitop | bool
+  tags: nvidia, nvitop

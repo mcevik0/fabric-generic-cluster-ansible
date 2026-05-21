@@ -29,24 +29,24 @@
       
     - role: system_updates
       tags: updates
-      when: perform_updates | default(true)
+      when: perform_updates | default(true) | bool
       
     - role: timesync
       tags: timesync
-      when: configure_timesync | default(true)
+      when: configure_timesync | default(true) | bool
       
     - role: selinux
       tags: selinux
       when: 
         - ansible_os_family == "RedHat"
-        - configure_selinux | default(true)
+        - configure_selinux | default(true) | bool
       
     - role: firewall
       tags: firewall
-      when: configure_firewall | default(false)
+      when: configure_firewall | default(false) | bool
 
     - role: docker
-      when: configure_docker | default(true)
+      when: configure_docker | default(true) | bool
 
   post_tasks:
     - name: Display completion message
